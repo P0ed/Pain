@@ -16,10 +16,26 @@ enum Tool {
 struct Color {
 	var rgba: [4 of UInt8]
 
-	var red: UInt8 { rgba[0] }
-	var green: UInt8 { rgba[1] }
-	var blue: UInt8 { rgba[2] }
-	var alpha: UInt8 { rgba[3] }
+	var red: UInt8 { get { rgba[0] } set { rgba[0] = newValue } }
+	var green: UInt8 { get { rgba[1] } set { rgba[1] = newValue } }
+	var blue: UInt8 { get { rgba[2] } set { rgba[2] = newValue } }
+	var alpha: UInt8 { get { rgba[3] } set { rgba[3] = newValue } }
+}
+
+extension Color: ExpressibleByIntegerLiteral {
+
+	init(integerLiteral value: UInt32) {
+		rgba = [
+			UInt8(value >> 0 & 0xFF),
+			UInt8(value >> 8 & 0xFF),
+			UInt8(value >> 16 & 0xFF),
+			UInt8(value >> 24 & 0xFF)
+		]
+	}
+}
+
+extension Color {
+	static var white: Self { .init(integerLiteral: ~0x0) }
 }
 
 struct Palette {
