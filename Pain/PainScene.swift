@@ -69,10 +69,10 @@ final class PainScene: SKScene {
 	}
 
 	override func mouseDown(with event: NSEvent) {
-		let (x, y) = event.location(in: canvas).int
+		let pxl = event.location(in: canvas).pxl
 		let color = palette.colors[colorIndices.primary]
 
-		if let idx = canvasSize.index(x, y) {
+		if let idx = canvasSize.index(at: pxl) {
 			buffer[idx] = color
 			texture.modifyColors(buffer.count) { ptr in ptr[idx] = color }
 		}

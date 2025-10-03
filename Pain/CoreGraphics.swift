@@ -22,9 +22,9 @@ extension CanvasSize {
 	var center: CGPoint { CGPoint(x: width / 2, y: height / 2) }
 	var pixelCount: Int { width * height }
 
-	func index(_ x: Int, _ y: Int) -> Int? {
-		if x >= 0 && x < width && y >= 0 && y < height {
-			.some(x + y * width)
+	func index(at pxl: PxL) -> Int? {
+		if pxl.x >= 0 && pxl.x < width && pxl.y >= 0 && pxl.y < height {
+			.some(pxl.x + pxl.y * width)
 		} else {
 			.none
 		}
@@ -36,5 +36,5 @@ extension CanvasSize {
 }
 
 extension CGPoint {
-	var int: (Int, Int) { (Int(x), Int(y)) }
+	var pxl: PxL { PxL(x: Int(x), y: Int(y)) }
 }

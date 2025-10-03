@@ -17,6 +17,11 @@ struct UInt4x2 {
 	}
 }
 
+struct PxL {
+	var x: Int
+	var y: Int
+}
+
 struct CanvasSize {
 	var width: Int
 	var height: Int
@@ -24,53 +29,4 @@ struct CanvasSize {
 
 enum Tool {
 	case pencil, eraser, bucket, picker
-}
-
-struct Color {
-	var red: UInt8
-	var green: UInt8
-	var blue: UInt8
-	var alpha: UInt8
-}
-
-extension Color: ExpressibleByIntegerLiteral {
-
-	init(integerLiteral value: UInt32) {
-		red = UInt8(value >> 8 & 0xFF)
-		green = UInt8(value >> 16 & 0xFF)
-		blue = UInt8(value >> 24 & 0xFF)
-		alpha = UInt8(value >> 0 & 0xFF)
-	}
-}
-
-extension Color {
-	static var white: Self { 0xFFFFFFFF }
-	static var black: Self { 0x000000FF }
-}
-
-struct Palette {
-	var colors: [16 of Color]
-}
-
-extension Palette {
-	static var main: Self {
-		.init(colors: [
-			.black,
-			.white,
-			.black,
-			.white,
-			.black,
-			.white,
-			.black,
-			.white,
-			.black,
-			.white,
-			.black,
-			.white,
-			.black,
-			.white,
-			.black,
-			.white,
-		])
-	}
 }
