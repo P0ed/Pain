@@ -7,35 +7,45 @@ struct UInt4x2 {
 	init(primary: Int, secondary: Int) {
 		rawValue = UInt8(primary & 0xF) | UInt8(secondary & 0xF) << 4
 	}
+
+	subscript(_ idx: Int) -> Int {
+		idx == 0 ? primary : secondary
+	}
+
+	mutating func swap() {
+		rawValue = rawValue >> 4 | (rawValue & 0xF) << 4
+	}
+}
+
+struct CanvasSize {
+	var width: Int
+	var height: Int
 }
 
 enum Tool {
-	case pencil, eraser, bucket
+	case pencil, eraser, bucket, picker
 }
 
 struct Color {
-	var rgba: [4 of UInt8]
-
-	var red: UInt8 { get { rgba[0] } set { rgba[0] = newValue } }
-	var green: UInt8 { get { rgba[1] } set { rgba[1] = newValue } }
-	var blue: UInt8 { get { rgba[2] } set { rgba[2] = newValue } }
-	var alpha: UInt8 { get { rgba[3] } set { rgba[3] = newValue } }
+	var red: UInt8
+	var green: UInt8
+	var blue: UInt8
+	var alpha: UInt8
 }
 
 extension Color: ExpressibleByIntegerLiteral {
 
 	init(integerLiteral value: UInt32) {
-		rgba = [
-			UInt8(value >> 0 & 0xFF),
-			UInt8(value >> 8 & 0xFF),
-			UInt8(value >> 16 & 0xFF),
-			UInt8(value >> 24 & 0xFF)
-		]
+		red = UInt8(value >> 8 & 0xFF)
+		green = UInt8(value >> 16 & 0xFF)
+		blue = UInt8(value >> 24 & 0xFF)
+		alpha = UInt8(value >> 0 & 0xFF)
 	}
 }
 
 extension Color {
-	static var white: Self { .init(integerLiteral: ~0x0) }
+	static var white: Self { 0xFFFFFFFF }
+	static var black: Self { 0x000000FF }
 }
 
 struct Palette {
@@ -44,6 +54,23 @@ struct Palette {
 
 extension Palette {
 	static var main: Self {
-		.init(colors: .init(repeating: .init(rgba: [0, 0, 0, .max])))
+		.init(colors: [
+			.black,
+			.white,
+			.black,
+			.white,
+			.black,
+			.white,
+			.black,
+			.white,
+			.black,
+			.white,
+			.black,
+			.white,
+			.black,
+			.white,
+			.black,
+			.white,
+		])
 	}
 }
