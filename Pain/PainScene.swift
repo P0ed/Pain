@@ -79,7 +79,7 @@ final class PainScene: SKScene {
 		switch tool {
 		case .pencil, .eraser:
 			if let idx = pxSize.index(at: pxl) {
-				let color = tool == .pencil ? palette[colorIndices.primary] : 0x0
+				let color = tool == .pencil ? palette[colorIndices.primary] : .clear
 				buffer[idx] = color
 				texture.modifyColors(buffer.count) { ptr in ptr[idx] = color }
 			}

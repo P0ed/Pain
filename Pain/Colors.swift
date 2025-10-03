@@ -11,6 +11,7 @@ extension Color: ExpressibleByIntegerLiteral {
 extension Color {
 	static var white: Self { 0xFFFFFFFF }
 	static var black: Self { 0x000000FF }
+	static var clear: Self { 0x0 }
 }
 
 extension Palette {
@@ -59,7 +60,7 @@ extension Palette {
 	}
 
 	/// https://lospec.com/palette-list/jonk-16
-	static var jonk: Self {
+	static var subdued: Self {
 		.init(colors: [
 			0x242E36FF,
 			0x455951FF,
@@ -77,6 +78,28 @@ extension Palette {
 			0xB7635BFF,
 			0xE39669FF,
 			0xEBC790FF,
+		])
+	}
+
+	/// https://lospec.com/palette-list/galaxy-flame
+	static var warm: Self {
+		.init(colors: [
+			0x699FADFF,
+			0x3A708EFF,
+			0x2B454FFF,
+			0x111215FF,
+			0x151D1AFF,
+			0x1D3230FF,
+			0x314E3FFF,
+			0x4F5D42FF,
+			0x9A9F87FF,
+			0xEDE6CBFF,
+			0xF5D893FF,
+			0xE8B26FFF,
+			0xB6834CFF,
+			0x704D2BFF,
+			0x40231EFF,
+			0x151015FF,
 		])
 	}
 }
