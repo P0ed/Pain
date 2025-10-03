@@ -16,33 +16,37 @@ final class PainScene: SKScene {
 		didSet { camera?.run(.scale(to: 1.0 / zoom, duration: 0.1)) }
 	}
 
-	init(size: CGSize, pxSize: PxSize) {
+	init(size: CGSize, pxSize: PxSize, data: [Color]? = .none) {
 		self.pxSize = pxSize
-		buffer = .init(repeating: .white, count: pxSize.count)
+		buffer = if let data, data.count == pxSize.count {
+			data
+		} else {
+			.init(repeating: .white, count: pxSize.count)
+		}
 		texture = SKMutableTexture(size: pxSize.cgSize)
 		texture.filteringMode = .nearest
 		canvas = SKSpriteNode(texture: texture)
 		canvas.anchorPoint = .zero
 
+		zoom = pxSize.zoomToFit(size)
+
+		let cam = SKCameraNode()
+		cam.position = pxSize.center
+		cam.setScale(1.0 / zoom)
+
 		super.init(size: size)
 
 		scaleMode = .aspectFill
+		backgroundColor = .gray
+
+		addChild(canvas)
+		addChild(cam)
+		camera = cam
+
 		texture.load(buffer)
 	}
 
 	required init?(coder aDecoder: NSCoder) { fatalError() }
-
-	override func sceneDidLoad() {
-		backgroundColor = .gray
-		addChild(canvas)
-
-		let cam = SKCameraNode()
-		cam.position = pxSize.center
-		addChild(cam)
-		camera = cam
-
-		zoom = pxSize.zoomToFit(size)
-	}
 
 	override func keyDown(with event: NSEvent) {
 
@@ -90,5 +94,41 @@ final class PainScene: SKScene {
 				palette[colorIndices.primary] = buffer[idx]
 			}
 		}
+	}
+}
+
+extension PainScene {
+
+	func exportCGImage() throws -> CGImage {
+		let width = pxSize.width
+		let height = pxSize.height
+		let bytesPerRow = width * 4
+
+		let image: CGImage = try buffer.withUnsafeBytes { raw in
+			let bytes = raw.bindMemory(to: UInt8.self)
+			let cfData = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
+				.unwrap("Can't make CFData")
+			let provider = try CGDataProvider(data: cfData)
+				.unwrap("Can't make CGDataProvider")
+			let colorSpace = CGColorSpaceCreateDeviceRGB()
+			let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+
+			return try CGImage(
+				width: width,
+				height: height,
+				bitsPerComponent: 8,
+				bitsPerPixel: 32,
+				bytesPerRow: bytesPerRow,
+				space: colorSpace,
+				bitmapInfo: bitmapInfo,
+				provider: provider,
+				decode: nil,
+				shouldInterpolate: false,
+				intent: .defaultIntent
+			)
+			.unwrap("Can't make CGImage")
+		}
+
+		return image
 	}
 }
