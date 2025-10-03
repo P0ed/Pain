@@ -1,10 +1,3 @@
-struct Color {
-	var red: UInt8
-	var green: UInt8
-	var blue: UInt8
-	var alpha: UInt8
-}
-
 extension Color: ExpressibleByIntegerLiteral {
 
 	init(integerLiteral value: UInt32) {
@@ -18,10 +11,6 @@ extension Color: ExpressibleByIntegerLiteral {
 extension Color {
 	static var white: Self { 0xFFFFFFFF }
 	static var black: Self { 0x000000FF }
-}
-
-struct Palette {
-	var colors: [16 of Color]
 }
 
 extension Palette {

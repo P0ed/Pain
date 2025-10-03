@@ -10,7 +10,7 @@ final class ViewController: NSViewController {
 
 		skView?.ignoresSiblingOrder = true
 		skView?.showsFPS = true
-		new(CanvasSize(width: 32, height: 32))
+		new(PxSize(width: 32, height: 32))
     }
 
 	override func viewDidLayout() {
@@ -18,8 +18,8 @@ final class ViewController: NSViewController {
 		(view as? SKView)?.scene?.size = view.frame.size
 	}
 
-	func new(_ canvasSize: CanvasSize) {
-		let scene = PainScene(size: view.frame.size, canvasSize: canvasSize)
+	func new(_ pxSize: PxSize) {
+		let scene = PainScene(size: view.frame.size, pxSize: pxSize)
 		skView?.presentScene(scene)
 	}
 

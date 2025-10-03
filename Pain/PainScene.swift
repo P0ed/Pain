@@ -1,7 +1,7 @@
 import SpriteKit
 
 final class PainScene: SKScene {
-	private let canvasSize: CanvasSize
+	private let pxSize: PxSize
 	private let canvas: SKSpriteNode
 	private let texture: SKMutableTexture
 
@@ -16,10 +16,10 @@ final class PainScene: SKScene {
 		didSet { camera?.run(.scale(to: 1.0 / zoom, duration: 0.1)) }
 	}
 
-	init(size: CGSize, canvasSize: CanvasSize) {
-		self.canvasSize = canvasSize
-		buffer = .init(repeating: .white, count: canvasSize.pixelCount)
-		texture = SKMutableTexture(size: canvasSize.cgSize)
+	init(size: CGSize, pxSize: PxSize) {
+		self.pxSize = pxSize
+		buffer = .init(repeating: .white, count: pxSize.count)
+		texture = SKMutableTexture(size: pxSize.cgSize)
 		texture.filteringMode = .nearest
 		canvas = SKSpriteNode(texture: texture)
 		canvas.anchorPoint = .zero
@@ -37,11 +37,11 @@ final class PainScene: SKScene {
 		addChild(canvas)
 
 		let cam = SKCameraNode()
-		cam.position = canvasSize.center
+		cam.position = pxSize.center
 		addChild(cam)
 		camera = cam
 
-		zoom = canvasSize.zoomToFit(size)
+		zoom = pxSize.zoomToFit(size)
 	}
 
 	override func keyDown(with event: NSEvent) {
@@ -56,10 +56,15 @@ final class PainScene: SKScene {
 
 		switch event.characters {
 		case "9": zoom = 1.0
-		case "0": zoom = canvasSize.zoomToFit(size)
+		case "0": zoom = pxSize.zoomToFit(size)
 		case "-": zoom = max(1.0, zoom / 2.0)
 		case "=": zoom = min(64.0, zoom * 2.0)
-		case "§": camera?.run(.move(to: canvasSize.center, duration: 0.1))
+		case "§": camera?.run(.move(to: pxSize.center, duration: 0.1))
+
+		case "p", "q": tool = .pencil
+		case "b", "w": tool = .bucket
+		case "e": tool = .eraser
+		case "i": tool = .picker
 
 		case "x": colorIndices.swap()
 
@@ -70,11 +75,20 @@ final class PainScene: SKScene {
 
 	override func mouseDown(with event: NSEvent) {
 		let pxl = event.location(in: canvas).pxl
-		let color = palette.colors[colorIndices.primary]
 
-		if let idx = canvasSize.index(at: pxl) {
-			buffer[idx] = color
-			texture.modifyColors(buffer.count) { ptr in ptr[idx] = color }
+		switch tool {
+		case .pencil, .eraser:
+			if let idx = pxSize.index(at: pxl) {
+				let color = tool == .pencil ? palette[colorIndices.primary] : 0x0
+				buffer[idx] = color
+				texture.modifyColors(buffer.count) { ptr in ptr[idx] = color }
+			}
+		case .bucket:
+			break
+		case .picker:
+			if let idx = pxSize.index(at: pxl) {
+				palette[colorIndices.primary] = buffer[idx]
+			}
 		}
 	}
 }

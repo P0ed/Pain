@@ -17,10 +17,10 @@ extension SKMutableTexture {
 	}
 }
 
-extension CanvasSize {
+extension PxSize {
 	var cgSize: CGSize { CGSize(width: width, height: height) }
 	var center: CGPoint { CGPoint(x: width / 2, y: height / 2) }
-	var pixelCount: Int { width * height }
+	var count: Int { width * height }
 
 	func index(at pxl: PxL) -> Int? {
 		if pxl.x >= 0 && pxl.x < width && pxl.y >= 0 && pxl.y < height {

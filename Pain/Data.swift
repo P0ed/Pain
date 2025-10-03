@@ -9,7 +9,7 @@ struct UInt4x2 {
 	}
 
 	subscript(_ idx: Int) -> Int {
-		idx == 0 ? primary : secondary
+		idx & 1 == 0 ? primary : secondary
 	}
 
 	mutating func swap() {
@@ -22,11 +22,27 @@ struct PxL {
 	var y: Int
 }
 
-struct CanvasSize {
+struct PxSize {
 	var width: Int
 	var height: Int
 }
 
 enum Tool {
 	case pencil, eraser, bucket, picker
+}
+
+struct Color {
+	var red: UInt8
+	var green: UInt8
+	var blue: UInt8
+	var alpha: UInt8
+}
+
+struct Palette {
+	var colors: [16 of Color]
+
+	subscript(_ idx: Int) -> Color {
+		get { colors[idx & 0xF] }
+		set { colors[idx & 0xF] = newValue }
+	}
 }
