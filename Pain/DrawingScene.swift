@@ -1,11 +1,12 @@
 import SpriteKit
+import SwiftUI
 
-final class PainScene: SKScene {
-	private let pxSize: PxSize
+final class DrawingScene: SKScene {
 	private let canvas: SKSpriteNode
 	private let texture: SKMutableTexture
 
-	private var buffer: [Color]
+	@Binding
+	private var document: Document
 
 	private var palette: Palette = .main
 	private var colorIndices: UInt4x2 = .init(primary: 0, secondary: 1)
@@ -16,22 +17,17 @@ final class PainScene: SKScene {
 		didSet { camera?.run(.scale(to: 1.0 / zoom, duration: 0.1)) }
 	}
 
-	init(size: CGSize, pxSize: PxSize, data: [Color]? = .none) {
-		self.pxSize = pxSize
-		buffer = if let data, data.count == pxSize.count {
-			data
-		} else {
-			.init(repeating: .white, count: pxSize.count)
-		}
-		texture = SKMutableTexture(size: pxSize.cgSize)
+	init(size: CGSize, document: Binding<Document>) {
+		_document = document
+		texture = SKMutableTexture(size: document.wrappedValue.size.cgSize)
 		texture.filteringMode = .nearest
 		canvas = SKSpriteNode(texture: texture)
 		canvas.anchorPoint = .zero
 
-		zoom = pxSize.zoomToFit(size)
+		zoom = document.wrappedValue.size.zoomToFit(size)
 
 		let cam = SKCameraNode()
-		cam.position = pxSize.center
+		cam.position = document.wrappedValue.size.center
 		cam.setScale(1.0 / zoom)
 
 		super.init(size: size)
@@ -43,7 +39,7 @@ final class PainScene: SKScene {
 		addChild(cam)
 		camera = cam
 
-		texture.load(buffer)
+		texture.load(document.wrappedValue.contents)
 	}
 
 	required init?(coder aDecoder: NSCoder) { fatalError() }
@@ -60,10 +56,10 @@ final class PainScene: SKScene {
 
 		switch event.characters {
 		case "9": zoom = 1.0
-		case "0": zoom = pxSize.zoomToFit(size)
+		case "0": zoom = document.size.zoomToFit(size)
 		case "-": zoom = max(1.0, zoom / 2.0)
 		case "=": zoom = min(64.0, zoom * 2.0)
-		case "§": camera?.run(.move(to: pxSize.center, duration: 0.1))
+		case "§": camera?.run(.move(to: document.size.center, duration: 0.1))
 
 		case "p", "q": tool = .pencil
 		case "b", "w": tool = .bucket
@@ -82,53 +78,17 @@ final class PainScene: SKScene {
 
 		switch tool {
 		case .pencil, .eraser:
-			if let idx = pxSize.index(at: pxl) {
+			if let idx = document.size.index(at: pxl) {
 				let color = tool == .pencil ? palette[colorIndices.primary] : .clear
-				buffer[idx] = color
-				texture.modifyColors(buffer.count) { ptr in ptr[idx] = color }
+				document.contents[idx] = color
+				texture.modifyColors(document.contents.count) { ptr in ptr[idx] = color }
 			}
 		case .bucket:
 			break
 		case .picker:
-			if let idx = pxSize.index(at: pxl) {
-				palette[colorIndices.primary] = buffer[idx]
+			if let idx = document.size.index(at: pxl) {
+				palette[colorIndices.primary] = document.contents[idx]
 			}
 		}
-	}
-}
-
-extension PainScene {
-
-	func exportCGImage() throws -> CGImage {
-		let width = pxSize.width
-		let height = pxSize.height
-		let bytesPerRow = width * 4
-
-		let image: CGImage = try buffer.withUnsafeBytes { raw in
-			let bytes = raw.bindMemory(to: UInt8.self)
-			let cfData = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
-				.unwrap("Can't make CFData")
-			let provider = try CGDataProvider(data: cfData)
-				.unwrap("Can't make CGDataProvider")
-			let colorSpace = CGColorSpaceCreateDeviceRGB()
-			let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-
-			return try CGImage(
-				width: width,
-				height: height,
-				bitsPerComponent: 8,
-				bitsPerPixel: 32,
-				bytesPerRow: bytesPerRow,
-				space: colorSpace,
-				bitmapInfo: bitmapInfo,
-				provider: provider,
-				decode: nil,
-				shouldInterpolate: false,
-				intent: .defaultIntent
-			)
-			.unwrap("Can't make CGImage")
-		}
-
-		return image
 	}
 }

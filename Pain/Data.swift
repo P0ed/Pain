@@ -31,7 +31,7 @@ enum Tool {
 	case pencil, eraser, bucket, picker
 }
 
-struct Color {
+struct Px {
 	var red: UInt8
 	var green: UInt8
 	var blue: UInt8
@@ -39,9 +39,9 @@ struct Color {
 }
 
 struct Palette {
-	var colors: [16 of Color]
+	var colors: [16 of Px]
 
-	subscript(_ idx: Int) -> Color {
+	subscript(_ idx: Int) -> Px {
 		get { colors[idx & 0xF] }
 		set { colors[idx & 0xF] = newValue }
 	}

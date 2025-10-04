@@ -2,15 +2,15 @@ import SpriteKit
 
 extension SKMutableTexture {
 
-	func modifyColors(_ cnt: Int, _ tfm: @escaping (UnsafeMutablePointer<Color>) -> Void) {
+	func modifyColors(_ cnt: Int, _ tfm: @escaping (UnsafeMutablePointer<Px>) -> Void) {
 		modifyPixelData { ptr, bytes in
 			guard let ptr, cnt * 4 == bytes else { return }
-			let ptrc = ptr.assumingMemoryBound(to: Color.self)
+			let ptrc = ptr.assumingMemoryBound(to: Px.self)
 			tfm(ptrc)
 		}
 	}
 
-	func load(_ buffer: [Color]) {
+	func load(_ buffer: [Px]) {
 		modifyColors(buffer.count, { ptr in
 			buffer.enumerated().forEach { i, c in ptr[i] = c }
 		})

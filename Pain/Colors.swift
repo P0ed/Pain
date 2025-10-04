@@ -1,4 +1,4 @@
-extension Color: ExpressibleByIntegerLiteral {
+extension Px: ExpressibleByIntegerLiteral {
 
 	init(integerLiteral value: UInt32) {
 		red = UInt8(value >> 8 & 0xFF)
@@ -8,10 +8,10 @@ extension Color: ExpressibleByIntegerLiteral {
 	}
 }
 
-extension Color {
+extension Px {
 	static var white: Self { 0xFFFFFFFF }
 	static var black: Self { 0x000000FF }
-	static var clear: Self { 0x0 }
+	static var clear: Self { 0x00000000 }
 }
 
 extension Palette {
