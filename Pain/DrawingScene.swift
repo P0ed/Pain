@@ -17,6 +17,9 @@ final class DrawingScene: SKScene {
 		didSet { camera?.run(.scale(to: 1.0 / zoom, duration: 0.1)) }
 	}
 
+	private var isInStroke = false
+	private var strokeChangedIndices: Set<Int> = []
+
 	init(size: CGSize, document: Binding<Document>) {
 		_document = document
 		texture = SKMutableTexture(size: document.wrappedValue.size.cgSize)
@@ -45,9 +48,7 @@ final class DrawingScene: SKScene {
 
 	required init?(coder aDecoder: NSCoder) { fatalError() }
 
-	override func didChangeSize(_ oldSize: CGSize) {
-
-	}
+	override var undoManager: UndoManager? { view?.window?.undoManager }
 
 	override func keyDown(with event: NSEvent) {
 
@@ -78,13 +79,30 @@ final class DrawingScene: SKScene {
 		}
 	}
 
+	private func setPixel(at idx: Int, to newColor: Px, coalesceInStroke: Bool) {
+		let oldColor = document.contents[idx]
+
+		if coalesceInStroke {
+			if strokeChangedIndices.contains(idx), oldColor == newColor { return }
+			strokeChangedIndices.insert(idx)
+		}
+
+		if oldColor == newColor { return }
+
+		document.contents[idx] = newColor
+		texture.modifyColors(document.contents.count) { ptr in ptr[idx] = newColor }
+
+		undoManager?.registerUndo(withTarget: self) { scene in
+			scene.setPixel(at: idx, to: oldColor, coalesceInStroke: false)
+		}
+	}
+
 	func draw(at pxl: PxL) {
 		switch tool {
 		case .pencil, .eraser:
 			if let idx = document.size.index(at: pxl) {
 				let color = tool == .pencil ? palette[colorIndices.primary] : .clear
-				document.contents[idx] = color
-				texture.modifyColors(document.contents.count) { ptr in ptr[idx] = color }
+				setPixel(at: idx, to: color, coalesceInStroke: isInStroke)
 			}
 		case .bucket:
 			break
@@ -96,10 +114,26 @@ final class DrawingScene: SKScene {
 	}
 
 	override func mouseDown(with event: NSEvent) {
+		isInStroke = true
+		strokeChangedIndices.removeAll()
+		undoManager?.beginUndoGrouping()
+		switch tool {
+		case .pencil: undoManager?.setActionName("Draw")
+		case .eraser: undoManager?.setActionName("Erase")
+		case .bucket: undoManager?.setActionName("Fill")
+		case .picker: break
+		}
 		draw(at: event.location(in: self).pxl)
 	}
 
 	override func mouseDragged(with event: NSEvent) {
 		draw(at: event.location(in: self).pxl)
+	}
+
+	override func mouseUp(with event: NSEvent) {
+		draw(at: event.location(in: self).pxl)
+		isInStroke = false
+		strokeChangedIndices = []
+		undoManager?.endUndoGrouping()
 	}
 }
