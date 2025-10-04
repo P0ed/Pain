@@ -22,7 +22,8 @@ final class DrawingScene: SKScene {
 		texture = SKMutableTexture(size: document.wrappedValue.size.cgSize)
 		texture.filteringMode = .nearest
 		canvas = SKSpriteNode(texture: texture)
-		canvas.anchorPoint = .zero
+		canvas.anchorPoint = CGPoint(x: 0, y: 1.0)
+		canvas.yScale = -1.0
 
 		zoom = document.wrappedValue.size.zoomToFit(size)
 
@@ -43,6 +44,10 @@ final class DrawingScene: SKScene {
 	}
 
 	required init?(coder aDecoder: NSCoder) { fatalError() }
+
+	override func didChangeSize(_ oldSize: CGSize) {
+
+	}
 
 	override func keyDown(with event: NSEvent) {
 
@@ -73,9 +78,7 @@ final class DrawingScene: SKScene {
 		}
 	}
 
-	override func mouseDown(with event: NSEvent) {
-		let pxl = event.location(in: canvas).pxl
-
+	func draw(at pxl: PxL) {
 		switch tool {
 		case .pencil, .eraser:
 			if let idx = document.size.index(at: pxl) {
@@ -90,5 +93,13 @@ final class DrawingScene: SKScene {
 				palette[colorIndices.primary] = document.contents[idx]
 			}
 		}
+	}
+
+	override func mouseDown(with event: NSEvent) {
+		draw(at: event.location(in: self).pxl)
+	}
+
+	override func mouseDragged(with event: NSEvent) {
+		draw(at: event.location(in: self).pxl)
 	}
 }
