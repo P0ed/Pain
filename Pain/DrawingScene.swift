@@ -7,8 +7,9 @@ final class DrawingScene: SKScene {
 
 	@Binding
 	private var document: Document
+	@Binding
+	private var palette: Palette
 
-	private var palette: Palette = .main
 	private var colorIndices: UInt4x2 = .init(primary: 0, secondary: 1)
 
 	private	var tool: Tool = .pencil
@@ -20,7 +21,8 @@ final class DrawingScene: SKScene {
 	private var isInStroke = false
 	private var strokeChangedIndices: Set<Int> = []
 
-	init(size: CGSize, document: Binding<Document>) {
+	init(size: CGSize, palette: Binding<Palette>, document: Binding<Document>) {
+		_palette = palette
 		_document = document
 		texture = SKMutableTexture(size: document.wrappedValue.size.cgSize)
 		texture.filteringMode = .nearest
@@ -61,6 +63,15 @@ final class DrawingScene: SKScene {
 		}
 
 		switch event.characters {
+		case "1": colorIndices.primary = 0 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "2": colorIndices.primary = 1 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "3": colorIndices.primary = 2 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "4": colorIndices.primary = 3 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "5": colorIndices.primary = 4 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "6": colorIndices.primary = 5 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "7": colorIndices.primary = 6 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		case "8": colorIndices.primary = 7 + (event.modifierFlags.contains(.command) ? 8 : 0)
+
 		case "9": zoom = 1.0
 		case "0": zoom = document.size.zoomToFit(size)
 		case "-": zoom = max(1.0, zoom / 2.0)
@@ -101,7 +112,7 @@ final class DrawingScene: SKScene {
 		switch tool {
 		case .pencil, .eraser:
 			if let idx = document.size.index(at: pxl) {
-				let color = tool == .pencil ? palette[colorIndices.primary] : .clear
+				let color = tool == .pencil ? palette[colorIndices.primary] : Px.clear
 				setPixel(at: idx, to: color, coalesceInStroke: isInStroke)
 			}
 		case .bucket:

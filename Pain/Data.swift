@@ -1,7 +1,10 @@
-struct UInt4x2 {
+struct UInt4x2: Hashable {
 	private var rawValue: UInt8
 
-	var primary: Int { Int(rawValue & 0xF) }
+	var primary: Int {
+		get { Int(rawValue & 0xF) }
+		set { rawValue = rawValue & 0xF0 | UInt8(newValue & 0x0F) }
+	}
 	var secondary: Int { Int((rawValue >> 4) & 0xF) }
 
 	init(primary: Int, secondary: Int) {
@@ -17,12 +20,12 @@ struct UInt4x2 {
 	}
 }
 
-struct PxL {
+struct PxL: Hashable {
 	var x: Int
 	var y: Int
 }
 
-struct PxSize {
+struct PxSize: Hashable {
 	var width: Int
 	var height: Int
 }
@@ -31,14 +34,31 @@ enum Tool {
 	case pencil, eraser, bucket, picker
 }
 
-struct Px: Hashable {
+struct Px: Hashable, Codable {
 	var red: UInt8
 	var green: UInt8
 	var blue: UInt8
 	var alpha: UInt8
 }
 
-struct Palette {
+extension Px {
+
+	init(rgba: UInt32) {
+		red = UInt8(rgba >> 8 & 0xFF)
+		green = UInt8(rgba >> 16 & 0xFF)
+		blue = UInt8(rgba >> 24 & 0xFF)
+		alpha = UInt8(rgba >> 0 & 0xFF)
+	}
+
+	var rgba: UInt32 {
+		UInt32(red) << 0
+		| UInt32(green) << 8
+		| UInt32(blue) << 16
+		| UInt32(alpha) << 24
+	}
+}
+
+struct Palette: Codable {
 	var colors: [16 of Px]
 
 	subscript(_ idx: Int) -> Px {
