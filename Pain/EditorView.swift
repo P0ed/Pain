@@ -31,14 +31,18 @@ struct EditorView: View {
 				.buttonStyle(.glass(state.tool == .pencil ? .regular : .clear))
 			Button("Eraser", action: { state.tool = .eraser })
 				.buttonStyle(.glass(state.tool == .eraser ? .regular : .clear))
+			Button("Bucket", action: { state.tool = .bucket })
+				.buttonStyle(.glass(state.tool == .bucket ? .regular : .clear))
+			Button("Replace", action: { state.tool = .replace })
+				.buttonStyle(.glass(state.tool == .replace ? .regular : .clear))
 			Spacer()
-			state.primaryColor.color
-			state.secondaryColor.color
+			state.primaryColor.color.border(.thinMaterial, width: 1.0)
+			state.secondaryColor.color.border(.thinMaterial, width: 1.0)
 			Spacer()
 			ForEach(
 				palette.colors,
 				id: \.hashValue,
-				content: \.color
+				content: { $0.color.border(.thinMaterial, width: 1.0) }
 			)
 		}
 		.background(Color.white)

@@ -26,7 +26,7 @@ struct PxSize: Hashable {
 }
 
 enum Tool {
-	case pencil, eraser, bucket, replace, picker
+	case pencil, eraser, bucket, replace
 }
 
 struct Px: Hashable, Codable {

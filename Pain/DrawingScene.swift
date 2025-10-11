@@ -16,8 +16,8 @@ final class DrawingScene: SKScene {
 		didSet { camera?.run(.scale(to: 1.0 / zoom, duration: 0.1)) }
 	}
 
-	private var stroke: [Int: Px] = [:]
-	private var drawing: Bool { !stroke.isEmpty }
+	private var stroke: [Int: Px]? = .none
+	private var drawing: Bool { stroke != .none }
 
 	private var lifetime: [Any] = []
 
@@ -97,6 +97,8 @@ final class DrawingScene: SKScene {
 			let idx = num + (flags.contains(.option) ? 8 : 0)
 			if flags.contains(.command) {
 				palette = [Palette].list[idx & 0x7]
+			} else if flags.contains(.control) {
+				palette[idx] = state.primaryColor
 			} else {
 				state.primaryColor = palette[idx]
 			}
@@ -121,7 +123,6 @@ final class DrawingScene: SKScene {
 		case "p": state.tool = .pencil
 		case "b": state.tool = .bucket
 		case "e": state.tool = .eraser
-		case "i": state.tool = .picker
 		case "r": state.tool = .replace
 
 		case "x": state.swapColors()
@@ -142,14 +143,10 @@ final class DrawingScene: SKScene {
 	func draw(at pxl: PxL) {
 		switch state.tool {
 		case .pencil, .eraser:
-			if let idx = document.size.index(at: pxl), stroke[idx] == nil {
+			if let idx = document.size.index(at: pxl), stroke?[idx] == nil {
 				let color = state.tool == .pencil ? state.primaryColor : Px.clear
-				stroke[idx] = document.pxs[idx]
+				stroke?[idx] = document.pxs[idx]
 				setPixels([idx: color])
-			}
-		case .picker:
-			if let idx = document.size.index(at: pxl) {
-				state.primaryColor = document.pxs[idx]
 			}
 		case .bucket:
 			if let idx = document.size.index(at: pxl) {
@@ -186,15 +183,21 @@ final class DrawingScene: SKScene {
 	}
 
 	override func mouseDown(with event: NSEvent) {
-		if state.tool.actionName != .none {
+		let pxl = event.location(in: self).pxl
+
+		if event.modifierFlags.contains(.option) {
+			if let idx = document.size.index(at: pxl) {
+				state.primaryColor = document.pxs[idx]
+			}
+		} else {
 			undoManager?.beginUndoGrouping()
+			stroke = [:]
+			draw(at: pxl)
 		}
-		stroke = [:]
-		draw(at: event.location(in: self).pxl)
 	}
 
 	override func mouseDragged(with event: NSEvent) {
-		if state.tool.draggable {
+		if state.tool.draggable, stroke != .none {
 			draw(at: event.location(in: self).pxl)
 		}
 	}
@@ -203,11 +206,11 @@ final class DrawingScene: SKScene {
 		if state.tool.draggable {
 			draw(at: event.location(in: self).pxl)
 		}
-		if let name = state.tool.actionName {
-			undoManager?.setActionName(name)
+		if stroke != .none {
+			undoManager?.setActionName(state.tool.actionName)
 			undoManager?.endUndoGrouping()
+			stroke = .none
 		}
-		stroke = [:]
 	}
 }
 
@@ -215,18 +218,17 @@ extension Tool {
 
 	var draggable: Bool {
 		switch self {
-		case .pencil, .eraser, .picker: true
+		case .pencil, .eraser: true
 		default: false
 		}
 	}
 
-	var actionName: String? {
+	var actionName: String {
 		switch self {
 		case .pencil: "Draw"
 		case .eraser: "Erase"
 		case .bucket: "Fill"
 		case .replace: "Replace"
-		case .picker: .none
 		}
 	}
 }
