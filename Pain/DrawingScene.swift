@@ -9,31 +9,38 @@ final class DrawingScene: SKScene {
 	private var document: Document
 	@Binding
 	private var palette: Palette
-
-	private var colorIndices: UInt4x2 = .init(primary: 0, secondary: 1)
-
-	private	var tool: Tool = .pencil
+	@Binding
+	private var state: EditorState
 
 	private var zoom: CGFloat = 1.0 {
 		didSet { camera?.run(.scale(to: 1.0 / zoom, duration: 0.1)) }
 	}
 
-	private var isInStroke = false
-	private var strokeChangedIndices: Set<Int> = []
+	private var stroke: [Int: Px] = [:]
+	private var drawing: Bool { !stroke.isEmpty }
 
-	init(size: CGSize, palette: Binding<Palette>, document: Binding<Document>) {
+	private var lifetime: [Any] = []
+
+	init(
+		size: CGSize,
+		palette: Binding<Palette>,
+		document: Binding<Document>,
+		state: Binding<EditorState>
+	) {
 		_palette = palette
 		_document = document
-		texture = SKMutableTexture(size: document.wrappedValue.size.cgSize)
+		_state = state
+		let doc = document.wrappedValue
+		texture = SKMutableTexture(size: doc.size.cgSize)
 		texture.filteringMode = .nearest
 		canvas = SKSpriteNode(texture: texture)
 		canvas.anchorPoint = CGPoint(x: 0, y: 1.0)
 		canvas.yScale = -1.0
 
-		zoom = document.wrappedValue.size.zoomToFit(size)
+		zoom = doc.size.zoomToFit(size)
 
 		let cam = SKCameraNode()
-		cam.position = document.wrappedValue.size.center
+		cam.position = doc.size.center
 		cam.setScale(1.0 / zoom)
 
 		super.init(size: size)
@@ -45,7 +52,27 @@ final class DrawingScene: SKScene {
 		addChild(cam)
 		camera = cam
 
-		texture.load(document.wrappedValue.contents)
+		texture.load(doc.pxs)
+
+		let reload = { [weak self] n in
+			if let self, let um = n.object as? UndoManager, undoManager == um {
+				texture.load(self.document.pxs)
+			}
+		} as (Notification) -> Void
+		lifetime = [
+			NotificationCenter.default.addObserver(
+				forName: .NSUndoManagerDidUndoChange,
+				object: nil,
+				queue: .main,
+				using: reload
+			),
+			NotificationCenter.default.addObserver(
+				forName: .NSUndoManagerDidRedoChange,
+				object: nil,
+				queue: .main,
+				using: reload
+			)
+		]
 	}
 
 	required init?(coder aDecoder: NSCoder) { fatalError() }
@@ -53,24 +80,37 @@ final class DrawingScene: SKScene {
 	override var undoManager: UndoManager? { view?.window?.undoManager }
 
 	override func keyDown(with event: NSEvent) {
+		guard !drawing else { return }
+
+		let flags = event.modifierFlags
+		let chars = event.charactersIgnoringModifiers
 
 		switch event.specialKey {
-		case .upArrow: camera?.run(.moveBy(x: 0.0, y: 32.0 / zoom, duration: 0.1))
-		case .downArrow: camera?.run(.moveBy(x: 0.0, y: -32.0 / zoom, duration: 0.1))
-		case .leftArrow: camera?.run(.moveBy(x: -32.0 / zoom, y: 0.0, duration: 0.1))
-		case .rightArrow: camera?.run(.moveBy(x: 32.0 / zoom, y: 0.0, duration: 0.1))
+		case .upArrow: camera?.run(.moveBy(x: 0.0, y: 48.0 / zoom, duration: 0.1))
+		case .downArrow: camera?.run(.moveBy(x: 0.0, y: -48.0 / zoom, duration: 0.1))
+		case .leftArrow: camera?.run(.moveBy(x: -48.0 / zoom, y: 0.0, duration: 0.1))
+		case .rightArrow: camera?.run(.moveBy(x: 48.0 / zoom, y: 0.0, duration: 0.1))
 		default: break
 		}
 
-		switch event.characters {
-		case "1": colorIndices.primary = 0 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "2": colorIndices.primary = 1 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "3": colorIndices.primary = 2 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "4": colorIndices.primary = 3 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "5": colorIndices.primary = 4 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "6": colorIndices.primary = 5 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "7": colorIndices.primary = 6 + (event.modifierFlags.contains(.command) ? 8 : 0)
-		case "8": colorIndices.primary = 7 + (event.modifierFlags.contains(.command) ? 8 : 0)
+		func numAction(_ num: Int) {
+			let idx = num + (flags.contains(.option) ? 8 : 0)
+			if flags.contains(.command) {
+				palette = [Palette].list[idx & 0x7]
+			} else {
+				state.primaryColor = palette[idx]
+			}
+		}
+
+		switch chars {
+		case "1": numAction(0)
+		case "2": numAction(1)
+		case "3": numAction(2)
+		case "4": numAction(3)
+		case "5": numAction(4)
+		case "6": numAction(5)
+		case "7": numAction(6)
+		case "8": numAction(7)
 
 		case "9": zoom = 1.0
 		case "0": zoom = document.size.zoomToFit(size)
@@ -78,73 +118,115 @@ final class DrawingScene: SKScene {
 		case "=": zoom = min(64.0, zoom * 2.0)
 		case "§": camera?.run(.move(to: document.size.center, duration: 0.1))
 
-		case "p", "q": tool = .pencil
-		case "b", "w": tool = .bucket
-		case "e": tool = .eraser
-		case "i": tool = .picker
+		case "p": state.tool = .pencil
+		case "b": state.tool = .bucket
+		case "e": state.tool = .eraser
+		case "i": state.tool = .picker
+		case "r": state.tool = .replace
 
-		case "x": colorIndices.swap()
-
-		case .some(let chars): print("keyDown: \(chars)")
+		case "x": state.swapColors()
 		default: break
 		}
 	}
 
-	private func setPixel(at idx: Int, to newColor: Px, coalesceInStroke: Bool) {
-		let oldColor = document.contents[idx]
+	private func setPixels(_ pxs: [Int: Px]) {
+		if pxs.isEmpty { return }
 
-		if coalesceInStroke {
-			if strokeChangedIndices.contains(idx), oldColor == newColor { return }
-			strokeChangedIndices.insert(idx)
-		}
+		pxs.forEach { idx, px in document.pxs[idx] = px }
 
-		if oldColor == newColor { return }
-
-		document.contents[idx] = newColor
-		texture.modifyColors(document.contents.count) { ptr in ptr[idx] = newColor }
-
-		undoManager?.registerUndo(withTarget: self) { scene in
-			scene.setPixel(at: idx, to: oldColor, coalesceInStroke: false)
+		texture.modifyColors(document.pxs.count) { ptr in
+			pxs.forEach { idx, px in ptr[idx] = px }
 		}
 	}
 
 	func draw(at pxl: PxL) {
-		switch tool {
+		switch state.tool {
 		case .pencil, .eraser:
-			if let idx = document.size.index(at: pxl) {
-				let color = tool == .pencil ? palette[colorIndices.primary] : Px.clear
-				setPixel(at: idx, to: color, coalesceInStroke: isInStroke)
+			if let idx = document.size.index(at: pxl), stroke[idx] == nil {
+				let color = state.tool == .pencil ? state.primaryColor : Px.clear
+				stroke[idx] = document.pxs[idx]
+				setPixels([idx: color])
 			}
-		case .bucket:
-			break
 		case .picker:
 			if let idx = document.size.index(at: pxl) {
-				palette[colorIndices.primary] = document.contents[idx]
+				state.primaryColor = document.pxs[idx]
+			}
+		case .bucket:
+			if let idx = document.size.index(at: pxl) {
+				let c = document.pxs[idx]
+				let rc = state.primaryColor
+
+				var stroke = [:] as [Int: Px]
+				var front = [pxl] as [PxL]
+				while !front.isEmpty {
+					front = front.flatMap { pxl in
+						pxl.neighbors.compactMap { pxl in
+							document.size.index(at: pxl).flatMap { idx in
+								if stroke[idx] == .none, document.pxs[idx] == c {
+									stroke[idx] = rc
+									return pxl
+								} else {
+									return .none
+								}
+							}
+						}
+					}
+				}
+				setPixels(stroke)
+			}
+			break
+		case .replace:
+			if let idx = document.size.index(at: pxl) {
+				let c = document.pxs[idx]
+				let rc = state.primaryColor
+				document.pxs = document.pxs.map { px in px == c ? rc : px }
+				texture.load(document.pxs)
 			}
 		}
 	}
 
 	override func mouseDown(with event: NSEvent) {
-		isInStroke = true
-		strokeChangedIndices.removeAll()
-		undoManager?.beginUndoGrouping()
-		switch tool {
-		case .pencil: undoManager?.setActionName("Draw")
-		case .eraser: undoManager?.setActionName("Erase")
-		case .bucket: undoManager?.setActionName("Fill")
-		case .picker: break
+		if state.tool.actionName != .none {
+			undoManager?.beginUndoGrouping()
 		}
+		stroke = [:]
 		draw(at: event.location(in: self).pxl)
 	}
 
 	override func mouseDragged(with event: NSEvent) {
-		draw(at: event.location(in: self).pxl)
+		if state.tool.draggable {
+			draw(at: event.location(in: self).pxl)
+		}
 	}
 
 	override func mouseUp(with event: NSEvent) {
-		draw(at: event.location(in: self).pxl)
-		isInStroke = false
-		strokeChangedIndices = []
-		undoManager?.endUndoGrouping()
+		if state.tool.draggable {
+			draw(at: event.location(in: self).pxl)
+		}
+		if let name = state.tool.actionName {
+			undoManager?.setActionName(name)
+			undoManager?.endUndoGrouping()
+		}
+		stroke = [:]
+	}
+}
+
+extension Tool {
+
+	var draggable: Bool {
+		switch self {
+		case .pencil, .eraser, .picker: true
+		default: false
+		}
+	}
+
+	var actionName: String? {
+		switch self {
+		case .pencil: "Draw"
+		case .eraser: "Erase"
+		case .bucket: "Fill"
+		case .replace: "Replace"
+		case .picker: .none
+		}
 	}
 }

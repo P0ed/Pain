@@ -40,3 +40,14 @@ extension InlineArray {
 		for i in indices { transform(&self[i]) }
 	}
 }
+
+extension Array {
+
+	func mapInPlace(_ transform: (inout Element) -> Void) -> Self {
+		map { x in
+			var x = x
+			transform(&x)
+			return x
+		}
+	}
+}

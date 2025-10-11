@@ -19,25 +19,29 @@ private func dtoa<A: Decodable>(_ data: Data) throws -> A {
 
 @propertyWrapper
 struct UserDefault<Value: Codable>: DynamicProperty {
-	private var key: String
-	private var store: UserDefaults
+	@AppStorage
+	private var data: Data?
 	private var defaultValue: () -> Value
 
 	init(
 		wrappedValue: Value? = .none,
 		key: String,
 		store: UserDefaults = .standard,
-		defaultValue: @escaping @autoclosure () -> Value
+		default: @escaping @autoclosure () -> Value
 	) {
-		self.key = key
-		self.store = store
-		self.defaultValue = defaultValue
+		_data = .init(key, store: store)
+		defaultValue = `default`
 		wrappedValue.map { self.wrappedValue = $0 }
 	}
 
+	private var codedValue: Value? {
+		get { try? data.map(dtoa) }
+		nonmutating set { data = try? newValue.map(atod) }
+	}
+
 	public var wrappedValue: Value {
-		get { store[key] ?? defaultValue() }
-		nonmutating set { store[key] = newValue }
+		get { codedValue ?? defaultValue() }
+		nonmutating set { codedValue = newValue }
 	}
 
 	public var projectedValue: Binding<Value> {

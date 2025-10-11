@@ -1,28 +1,23 @@
-struct UInt4x2: Hashable {
-	private var rawValue: UInt8
-
-	var primary: Int {
-		get { Int(rawValue & 0xF) }
-		set { rawValue = rawValue & 0xF0 | UInt8(newValue & 0x0F) }
-	}
-	var secondary: Int { Int((rawValue >> 4) & 0xF) }
-
-	init(primary: Int, secondary: Int) {
-		rawValue = UInt8(primary & 0xF) | UInt8(secondary & 0xF) << 4
-	}
-
-	subscript(_ idx: Int) -> Int {
-		idx & 1 == 0 ? primary : secondary
-	}
-
-	mutating func swap() {
-		rawValue = rawValue >> 4 | (rawValue & 0xF) << 4
-	}
-}
-
 struct PxL: Hashable {
-	var x: Int
-	var y: Int
+    private var _x: Int16
+    private var _y: Int16
+    
+    var x: Int { Int(_x) }
+    var y: Int { Int(_y) }
+    
+    init(x: Int, y: Int) {
+        _x = Int16(x)
+        _y = Int16(y)
+    }
+
+	var neighbors: [PxL] {
+		[
+			.init(x: x - 1, y: y),
+			.init(x: x + 1, y: y),
+			.init(x: x, y: y - 1),
+			.init(x: x, y: y + 1),
+		]
+	}
 }
 
 struct PxSize: Hashable {
@@ -31,7 +26,7 @@ struct PxSize: Hashable {
 }
 
 enum Tool {
-	case pencil, eraser, bucket, picker
+	case pencil, eraser, bucket, replace, picker
 }
 
 struct Px: Hashable, Codable {
@@ -58,11 +53,35 @@ extension Px {
 	}
 }
 
-struct Palette: Codable {
-	var colors: [16 of Px]
+struct Palette: Hashable, Codable {
+	var colors: [Px]
 
 	subscript(_ idx: Int) -> Px {
 		get { colors[idx & 0xF] }
 		set { colors[idx & 0xF] = newValue }
+	}
+}
+
+struct EditorState: Hashable {
+	var primaryColor: Px = .black
+	var secondaryColor: Px = .white
+	var tool: Tool = .pencil
+}
+
+extension EditorState {
+
+	mutating func swapColors() {
+		swap(&primaryColor, &secondaryColor)
+	}
+}
+
+extension PxSize {
+
+	func forEach(_ fn: (Int, Int) -> Void) {
+		(0..<height).forEach { y in
+			(0..<width).forEach { x in
+				fn(x, y)
+			}
+		}
 	}
 }

@@ -29,6 +29,10 @@ extension PxSize {
 			.none
 		}
 	}
+    
+    func alloc(color: Px) -> [Px] {
+        .init(repeating: color, count: count)
+    }
 
 	func zoomToFit(_ size: CGSize) -> CGFloat {
 		min(size.width / CGFloat(width), size.height / CGFloat(height))

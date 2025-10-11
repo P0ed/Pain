@@ -4,14 +4,19 @@ import UniformTypeIdentifiers
 
 struct Document: FileDocument {
 	var size: PxSize
-	var contents: [Px]
+	var pxs: [Px]
 
 	static var readableContentTypes: [UTType] { [.png] }
 	static var writableContentTypes: [UTType] { [.png] }
 
+	subscript(_ pxl: PxL) -> Px {
+		get { pxs[size.index(at: pxl)!] }
+		set { pxs[size.index(at: pxl)!] = newValue }
+	}
+
 	init() {
-		size = PxSize(width: 32, height: 32)
-		contents = [Px](repeating: .white, count: size.count)
+		size = PxSize(width: 48, height: 32)
+        pxs = size.alloc(color: .white)
 	}
 
 	init(configuration: ReadConfiguration) throws {
@@ -22,9 +27,9 @@ struct Document: FileDocument {
 			.unwrap("Failed to open image")
 
 		size = PxSize(width: image.width, height: image.height)
-		contents = [Px](repeating: .clear, count: size.count)
+        pxs = size.alloc(color: .clear)
 
-		contents.withUnsafeMutableBytes { [size] ptr in
+		pxs.withUnsafeMutableBytes { [size] ptr in
 			let colorSpace = CGColorSpaceCreateDeviceRGB()
 			if let ctx = CGContext(
 				data: ptr.baseAddress,
@@ -42,7 +47,7 @@ struct Document: FileDocument {
 	}
 
 	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-		let image: CGImage = try contents.withUnsafeBytes { raw in
+		let image: CGImage = try pxs.withUnsafeBytes { raw in
 			let bytes = raw.bindMemory(to: UInt8.self)
 			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
 				.unwrap("Can't make CFData")
