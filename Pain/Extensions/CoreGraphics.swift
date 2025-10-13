@@ -39,6 +39,14 @@ extension PxSize {
 	}
 }
 
+extension CGSize {
+
+	func zoomed(_ scale: CGFloat) -> CGSize {
+		.init(width: width * scale, height: height * scale)
+	}
+}
+
 extension CGPoint {
+
 	var pxl: PxL { PxL(x: Int(x), y: Int(y)) }
 }

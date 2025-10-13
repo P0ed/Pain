@@ -50,4 +50,12 @@ extension Array {
 			return x
 		}
 	}
+
+	func chunks(ofCount count: Int) -> [[Element]] {
+		stride(from: 0, to: self.count - 1, by: count).map { idx in
+			stride(from: idx, to: idx + count, by: 1).map { idx in
+				self[idx]
+			}
+		}
+	}
 }

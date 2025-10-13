@@ -47,7 +47,15 @@ struct Document: FileDocument {
 	}
 
 	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-		let image: CGImage = try pxs.withUnsafeBytes { raw in
+		try FileWrapper(
+			regularFileWithContents: NSBitmapImageRep(cgImage: cgImage())
+				.representation(using: .png, properties: [:])
+				.unwrap("Failed to create PNG representation")
+		)
+	}
+
+	func cgImage() throws -> CGImage {
+		try pxs.withUnsafeBytes { raw in
 			let bytes = raw.bindMemory(to: UInt8.self)
 			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
 				.unwrap("Can't make CFData")
@@ -71,10 +79,5 @@ struct Document: FileDocument {
 			)
 			.unwrap("Can't make CGImage")
 		}
-		let rep = NSBitmapImageRep(cgImage: image)
-		let data = try rep.representation(using: .png, properties: [:])
-			.unwrap("Failed to create PNG representation")
-
-		return .init(regularFileWithContents: data)
 	}
 }

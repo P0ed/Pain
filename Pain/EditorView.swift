@@ -1,51 +1,49 @@
 import SwiftUI
-import SpriteKit
+
+struct EditorState {
+	var primaryColor: Px = .black
+	var secondaryColor: Px = .white
+	var tool: Tool = .pencil
+	var zoom: Double = 8.0
+	var size: CGSize = .zero
+	var modifiers: EventModifiers = []
+}
 
 struct EditorView: View {
 	@State
-	var state: EditorState = .init(primaryColor: .black, secondaryColor: .white, tool: .pencil)
+	var state: EditorState = .init()
 	@Binding
 	var palette: Palette
 	@Binding
 	var document: Document
+	@Environment(\.undoManager)
+	var undoManager
+
+	var size: CGSize {
+		document.size.cgSize.zoomed(state.zoom)
+	}
 
 	var body: some View {
 		NavigationSplitView(
 			sidebar: { toolBar },
 			detail: {
-				SpriteView(
-					scene: DrawingScene(
-						size: CGSize(width: 800, height: 600),
-						palette: $palette,
-						document: $document,
-						state: $state
-					)
-				)
+				GeometryReader { geo in
+					ScrollView([.vertical, .horizontal]) {
+						Canvas { ctx, _ in
+							guard let image = document.image else { return }
+							state.size = geo.size
+
+							ctx.draw(
+								image,
+								in: .init(origin: .zero, size: size)
+							)
+						}
+						.frame(width: size.width, height: size.height)
+						.gesture(dragController)
+					}
+				}
 			}
 		)
-	}
-
-	var toolBar: some View {
-		List {
-			Button("Pencil", action: { state.tool = .pencil })
-				.buttonStyle(.glass(state.tool == .pencil ? .regular : .clear))
-			Button("Eraser", action: { state.tool = .eraser })
-				.buttonStyle(.glass(state.tool == .eraser ? .regular : .clear))
-			Button("Bucket", action: { state.tool = .bucket })
-				.buttonStyle(.glass(state.tool == .bucket ? .regular : .clear))
-			Button("Replace", action: { state.tool = .replace })
-				.buttonStyle(.glass(state.tool == .replace ? .regular : .clear))
-			Spacer()
-			state.primaryColor.color.border(.thinMaterial, width: 1.0)
-			state.secondaryColor.color.border(.thinMaterial, width: 1.0)
-			Spacer()
-			ForEach(
-				palette.colors,
-				id: \.hashValue,
-				content: { $0.color.border(.thinMaterial, width: 1.0) }
-			)
-		}
-		.background(Color.white)
+		.onKeyPress(action: keyboardController)
 	}
 }
-

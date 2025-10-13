@@ -5,13 +5,6 @@ extension Px: ExpressibleByIntegerLiteral {
 	}
 }
 
-extension Px {
-	static var white: Self { 0xFFFFFFFF }
-	static var black: Self { 0x000000FF }
-	static var gray: Self { 0x7F7F7FFF }
-	static var clear: Self { 0x00000000 }
-}
-
 extension [Palette] {
 
 	static var list: Self {

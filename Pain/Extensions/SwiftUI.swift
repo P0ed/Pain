@@ -12,3 +12,10 @@ extension Px {
 		)
 	}
 }
+
+extension Document {
+
+	var image: Image? {
+		try? Image(decorative: cgImage(), scale: 1.0).interpolation(.none)
+	}
+}

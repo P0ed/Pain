@@ -53,6 +53,12 @@ extension Px {
 	}
 }
 
+extension Px {
+	static var white: Self { 0xFFFFFFFF }
+	static var black: Self { 0x000000FF }
+	static var clear: Self { 0x00000000 }
+}
+
 struct Palette: Hashable, Codable {
 	var colors: [Px]
 
@@ -62,17 +68,13 @@ struct Palette: Hashable, Codable {
 	}
 }
 
-struct EditorState: Hashable {
-	var primaryColor: Px = .black
-	var secondaryColor: Px = .white
-	var tool: Tool = .pencil
-}
-
 extension EditorState {
 
 	mutating func swapColors() {
 		swap(&primaryColor, &secondaryColor)
 	}
+
+	var colors: [Px] { [primaryColor, secondaryColor] }
 }
 
 extension PxSize {
@@ -82,6 +84,34 @@ extension PxSize {
 			(0..<width).forEach { x in
 				fn(x, y)
 			}
+		}
+	}
+}
+
+extension Tool {
+
+	var isDraggable: Bool {
+		switch self {
+		case .pencil, .eraser: true
+		default: false
+		}
+	}
+
+	var actionName: String {
+		switch self {
+		case .pencil: "Pencil"
+		case .eraser: "Erase"
+		case .bucket: "Bucket"
+		case .replace: "Replace"
+		}
+	}
+
+	var shortcutCharacter: Character {
+		switch self {
+		case .pencil: "p"
+		case .eraser: "e"
+		case .bucket: "b"
+		case .replace: "r"
 		}
 	}
 }
