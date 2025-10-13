@@ -16,7 +16,6 @@ extension EditorView {
 			}
 		}
 	}
-
 }
 
 struct ToolButton: View {

@@ -6,6 +6,7 @@ struct EditorState {
 	var tool: Tool = .pencil
 	var zoom: Double = 8.0
 	var size: CGSize = .zero
+	var drawing: Set<PxL> = []
 	var modifiers: EventModifiers = []
 }
 
@@ -18,6 +19,9 @@ struct EditorView: View {
 	var document: Document
 	@Environment(\.undoManager)
 	var undoManager
+
+	@State
+	var zoom: CGFloat?
 
 	var size: CGSize {
 		document.size.cgSize.zoomed(state.zoom)
@@ -39,7 +43,8 @@ struct EditorView: View {
 							)
 						}
 						.frame(width: size.width, height: size.height)
-						.gesture(dragController)
+						.gesture(drawingController)
+						.gesture(zoomingController)
 					}
 				}
 			}

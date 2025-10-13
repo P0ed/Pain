@@ -2,16 +2,15 @@ import SwiftUI
 
 extension EditorView {
 
-	var dragController: some Gesture {
-		@State var stroke = [:] as [Int: Px]
-		return DragGesture(minimumDistance: 0)
+	var drawingController: some Gesture {
+		DragGesture(minimumDistance: 0)
 			.onChanged { gesture in
 				let pxl = CGPoint(
 					x: gesture.location.x / state.zoom,
 					y: document.size.cgSize.height - gesture.location.y / state.zoom
 				).pxl
 
-				if stroke.isEmpty {
+				if state.drawing.isEmpty {
 					if state.modifiers.contains(.option) {
 						if let idx = document.size.index(at: pxl) {
 							state.primaryColor = document.pxs[idx]
@@ -19,12 +18,12 @@ extension EditorView {
 						}
 					}
 				}
-				if state.tool.isDraggable || stroke == [:] {
+				if state.tool.isDraggable || state.drawing.isEmpty {
 					draw(at: pxl)
 				}
 			}
 			.onEnded { _ in
-				stroke = [:]
+				state.drawing = []
 				undoManager?.beginUndoGrouping()
 				undoManager?.setActionName(state.tool.actionName)
 				undoManager?.endUndoGrouping()
