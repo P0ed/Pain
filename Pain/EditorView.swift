@@ -1,31 +1,22 @@
 import SwiftUI
 
-struct EditorState {
+struct EditorState: Hashable {
 	var primaryColor: Px = .black
 	var secondaryColor: Px = .white
 	var tool: Tool = .pencil
 	var zoom: Double = 8.0
 	var size: CGSize = .zero
 	var drawing: Set<PxL> = []
-	var modifiers: EventModifiers = []
+	var pointer: CGPoint?
 }
 
 struct EditorView: View {
-	@State
-	var state: EditorState = .init()
-	@Binding
-	var palette: Palette
-	@Binding
-	var document: Document
-	@Environment(\.undoManager)
-	var undoManager
-
-	@State
-	var zoom: CGFloat?
-
-	var size: CGSize {
-		document.size.cgSize.zoomed(state.zoom)
-	}
+	@State var state: EditorState = .init()
+	@Binding var palette: Palette
+	@Binding var document: Document
+	@Environment(\.undoManager) var undoManager
+	@State var zoom: Double?
+	@FocusState private var focused: Bool
 
 	var body: some View {
 		NavigationSplitView(
@@ -43,12 +34,17 @@ struct EditorView: View {
 							)
 						}
 						.frame(width: size.width, height: size.height)
+						.focusable()
+						.focused($focused)
+						.focusEffectDisabled()
+						.onAppear { focused = true }
+						.onKeyPress(action: keyboardController)
 						.gesture(drawingController)
 						.gesture(zoomingController)
+						.onContinuousHover { phase in state.pointer = phase.location }
 					}
 				}
 			}
 		)
-		.onKeyPress(action: keyboardController)
 	}
 }

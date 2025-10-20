@@ -2,24 +2,20 @@ import SwiftUI
 
 extension EditorView {
 
+	var size: CGSize { document.size.cgSize.zoomed(state.zoom) }
+
+	func pxl(at location: CGPoint) -> PxL {
+		CGPoint(
+			x: location.x / state.zoom,
+			y: document.size.cgSize.height - location.y / state.zoom
+		).pxl
+	}
+
 	var drawingController: some Gesture {
 		DragGesture(minimumDistance: 0)
 			.onChanged { gesture in
-				let pxl = CGPoint(
-					x: gesture.location.x / state.zoom,
-					y: document.size.cgSize.height - gesture.location.y / state.zoom
-				).pxl
-
-				if state.drawing.isEmpty {
-					if state.modifiers.contains(.option) {
-						if let idx = document.size.index(at: pxl) {
-							state.primaryColor = document.pxs[idx]
-							return
-						}
-					}
-				}
 				if state.tool.isDraggable || state.drawing.isEmpty {
-					draw(at: pxl)
+					draw(at: pxl(at: gesture.location))
 				}
 			}
 			.onEnded { _ in

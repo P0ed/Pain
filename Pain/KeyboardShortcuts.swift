@@ -4,14 +4,14 @@ extension EditorView {
 
 	var keyboardController: (KeyPress) -> KeyPress.Result {
 		{ keys in
-			state.modifiers = keys.modifiers
+			let modifiers = keys.modifiers
 			let chars = keys.characters
 
 			func numAction(_ num: Int) {
-				let idx = num + (state.modifiers.contains(.option) ? 8 : 0)
-				if state.modifiers.contains(.command) {
+				let idx = num + (modifiers.contains(.option) ? 8 : 0)
+				if modifiers.contains(.command) {
 					palette = [Palette].list[idx & 0x7]
-				} else if state.modifiers.contains(.control) {
+				} else if modifiers.contains(.control) {
 					palette[idx] = state.primaryColor
 				} else {
 					state.primaryColor = palette[idx]
@@ -34,11 +34,18 @@ extension EditorView {
 			case "=": state.zoom = min(64.0, state.zoom * 2.0)
 
 			case "x": state.swapColors()
+			case "c": pickColor()
 
 			default: return .ignored
 			}
 
 			return .handled
+		}
+	}
+
+	func pickColor() {
+		if let pointer = state.pointer, let idx = document.size.index(at: pxl(at: pointer)) {
+			state.primaryColor = document.pxs[idx]
 		}
 	}
 }

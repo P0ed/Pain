@@ -19,3 +19,10 @@ extension Document {
 		try? Image(decorative: cgImage(), scale: 1.0).interpolation(.none)
 	}
 }
+
+extension HoverPhase {
+
+	var location: CGPoint? {
+		if case .active(let location) = self { location } else { .none }
+	}
+}

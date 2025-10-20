@@ -3,17 +3,16 @@ import SwiftUI
 extension EditorView {
 
 	var toolBar: some View {
-		List {
-			VStack(spacing: 12.0) {
-				ToolButton(tool: .pencil, state: $state.tool)
-				ToolButton(tool: .eraser, state: $state.tool)
-				ToolButton(tool: .bucket, state: $state.tool)
-				ToolButton(tool: .replace, state: $state.tool)
-				Spacer()
-				ColorsView(colors: state.colors)
-				Spacer()
-				ColorsView(colors: palette.colors)
-			}
+		VStack(spacing: 12.0) {
+			ToolButton(tool: .pencil, state: $state.tool)
+			ToolButton(tool: .eraser, state: $state.tool)
+			ToolButton(tool: .bucket, state: $state.tool)
+			ToolButton(tool: .replace, state: $state.tool)
+			Spacer()
+			ColorsView(colors: state.colors)
+			Spacer()
+			ColorsView(colors: palette.colors)
+			Spacer()
 		}
 	}
 }
@@ -29,7 +28,7 @@ struct ToolButton: View {
 				.frame(width: 96.0 + 12.0, height: 32.0)
 				.background(
 					RoundedRectangle(cornerRadius: 12.0)
-						.fill(state == tool ? .primary : .quaternary)
+						.fill(state == tool ? .secondary : .tertiary)
 				)
 		})
 		.keyboardShortcut(KeyEquivalent(tool.shortcutCharacter), modifiers: [])
