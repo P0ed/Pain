@@ -1,21 +1,4 @@
-import SpriteKit
-
-extension SKMutableTexture {
-
-	func modifyColors(_ cnt: Int, _ tfm: @escaping (UnsafeMutablePointer<Px>) -> Void) {
-		modifyPixelData { ptr, bytes in
-			guard let ptr, cnt * 4 == bytes else { return }
-			let ptrc = ptr.assumingMemoryBound(to: Px.self)
-			tfm(ptrc)
-		}
-	}
-
-	func load(_ buffer: [Px]) {
-		modifyColors(buffer.count, { ptr in
-			buffer.enumerated().forEach { i, c in ptr[i] = c }
-		})
-	}
-}
+import CoreGraphics
 
 extension PxSize {
 	var cgSize: CGSize { CGSize(width: width, height: height) }
@@ -29,7 +12,11 @@ extension PxSize {
 			.none
 		}
 	}
-    
+
+	func pxl(at index: Int) -> PxL {
+		PxL(x: index % width, y: index / width)
+	}
+
     func alloc(color: Px) -> [Px] {
         .init(repeating: color, count: count)
     }

@@ -2,12 +2,12 @@ import SwiftUI
 
 extension EditorView {
 
-	var size: CGSize { document.size.cgSize.zoomed(state.zoom) }
+	var size: CGSize { document.size.cgSize.zoomed(state.magnification) }
 
 	func pxl(at location: CGPoint) -> PxL {
 		CGPoint(
-			x: location.x / state.zoom,
-			y: document.size.cgSize.height - location.y / state.zoom
+			x: location.x / state.magnification,
+			y: document.size.cgSize.height - location.y / state.magnification
 		).pxl
 	}
 
@@ -31,7 +31,10 @@ private extension EditorView {
 
 	func draw(at pxl: PxL) {
 		switch state.tool {
-		case .pencil: pencil(state.primaryColor, at: pxl)
+		case .pencil: pencil(
+			state.dither && pxl.isEven ? state.secondaryColor : state.primaryColor,
+			at: pxl
+		)
 		case .eraser: pencil(.clear, at: pxl)
 		case .bucket: bucket(at: pxl)
 		case .replace: replace(at: pxl)
@@ -47,16 +50,17 @@ private extension EditorView {
 	private func bucket(at pxl: PxL) {
 		if let idx = document.size.index(at: pxl) {
 			let c = document.pxs[idx]
-			let rc = state.primaryColor
+			let pc = state.primaryColor
+			let sc = state.dither ? state.secondaryColor : pc
 
-			var stroke = [:] as [Int: Px]
+			var stroke = [idx: pxl.isEven ? sc : pc] as [Int: Px]
 			var front = [pxl] as [PxL]
 			while !front.isEmpty {
 				front = front.flatMap { pxl in
 					pxl.neighbors.compactMap { pxl in
 						document.size.index(at: pxl).flatMap { idx in
 							if stroke[idx] == .none, document.pxs[idx] == c {
-								stroke[idx] = rc
+								stroke[idx] = pxl.isEven ? sc : pc
 								return pxl
 							} else {
 								return .none
@@ -74,8 +78,14 @@ private extension EditorView {
 	private func replace(at pxl: PxL) {
 		if let idx = document.size.index(at: pxl) {
 			let c = document.pxs[idx]
-			let rc = state.primaryColor
-			document.pxs = document.pxs.map { px in px == c ? rc : px }
+			let pc = state.primaryColor
+			let sc = state.dither ? state.secondaryColor : pc
+
+			document.pxs = document.pxs.enumerated()
+				.map { [size = document.size] idx, px in
+					let rc = size.pxl(at: idx).isEven ? pc : sc
+					return px == c ? rc : px
+				}
 		}
 	}
 }

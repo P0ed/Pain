@@ -10,6 +10,8 @@ extension EditorView {
 			ToolButton(tool: .replace, state: $state.tool)
 			Spacer()
 			ColorsView(colors: state.colors)
+			Toggle("Dither", isOn: $state.dither)
+				.keyboardShortcut(KeyEquivalent("d"), modifiers: [])
 			Spacer()
 			ColorsView(colors: palette.colors)
 			Spacer()

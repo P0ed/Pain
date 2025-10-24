@@ -18,6 +18,10 @@ struct PxL: Hashable {
 			.init(x: x, y: y + 1),
 		]
 	}
+
+	var isEven: Bool {
+		(x & 1 + y & 1) & 1 == 0
+	}
 }
 
 struct PxSize: Hashable {
@@ -79,10 +83,10 @@ extension EditorState {
 
 extension PxSize {
 
-	func forEach(_ fn: (Int, Int) -> Void) {
+	func forEach(_ fn: (PxL) -> Void) {
 		(0..<height).forEach { y in
 			(0..<width).forEach { x in
-				fn(x, y)
+				fn(PxL(x: x, y: y))
 			}
 		}
 	}
