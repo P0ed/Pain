@@ -28,10 +28,10 @@ extension EditorView {
 			case "7": numAction(6)
 			case "8": numAction(7)
 
-			case "9": state.zoom = 1.0
-			case "0": state.zoom = document.size.zoomToFit(state.size)
-			case "-": state.zoom = max(1.0, state.zoom / 2.0)
-			case "=": state.zoom = min(64.0, state.zoom * 2.0)
+			case "9": state.magnification = 1.0
+			case "0": state.magnification = file.size.zoomToFit(state.size)
+			case "-": state.magnification = max(1.0, state.magnification / 2.0)
+			case "=": state.magnification = min(64.0, state.magnification * 2.0)
 
 			case "x": state.swapColors()
 			case "c": pickColor()
@@ -44,8 +44,8 @@ extension EditorView {
 	}
 
 	func pickColor() {
-		if let pointer = state.pointer, let idx = document.size.index(at: pxl(at: pointer)) {
-			state.primaryColor = document.pxs[idx]
+		if let pointer = state.pointer, let idx = file.size.index(at: pxl(at: pointer)) {
+			state.primaryColor = file.pxs[idx]
 		}
 	}
 }

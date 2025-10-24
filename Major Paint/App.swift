@@ -9,7 +9,7 @@ struct PaintApp: App {
 		DocumentGroup(
 			newDocument: Document(),
 			editor: { cfg in
-				EditorView(palette: $palette, document: cfg.$document)
+				EditorView(palette: $palette, file: cfg.$document)
 			}
 		)
 	}

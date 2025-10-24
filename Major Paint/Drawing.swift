@@ -2,12 +2,12 @@ import SwiftUI
 
 extension EditorView {
 
-	var size: CGSize { document.size.cgSize.zoomed(state.zoom) }
+	var size: CGSize { file.size.cgSize.zoomed(state.magnification) }
 
 	func pxl(at location: CGPoint) -> PxL {
 		CGPoint(
-			x: location.x / state.zoom,
-			y: document.size.cgSize.height - location.y / state.zoom
+			x: location.x / state.magnification,
+			y: file.size.cgSize.height - location.y / state.magnification
 		).pxl
 	}
 
@@ -31,7 +31,10 @@ private extension EditorView {
 
 	func draw(at pxl: PxL) {
 		switch state.tool {
-		case .pencil: pencil(state.primaryColor, at: pxl)
+		case .pencil: pencil(
+			state.dither && pxl.isEven ? state.secondaryColor : state.primaryColor,
+			at: pxl
+		)
 		case .eraser: pencil(.clear, at: pxl)
 		case .bucket: bucket(at: pxl)
 		case .replace: replace(at: pxl)
@@ -39,24 +42,25 @@ private extension EditorView {
 	}
 
 	private func pencil(_ px: Px, at pxl: PxL) {
-		if let idx = document.size.index(at: pxl) {
-			document.pxs[idx] = px
+		if let idx = file.size.index(at: pxl) {
+			file.pxs[idx] = px
 		}
 	}
 
 	private func bucket(at pxl: PxL) {
-		if let idx = document.size.index(at: pxl) {
-			let c = document.pxs[idx]
-			let rc = state.primaryColor
+		if let idx = file.size.index(at: pxl) {
+			let c = file.pxs[idx]
+			let pc = state.primaryColor
+			let sc = state.dither ? state.secondaryColor : pc
 
-			var stroke = [:] as [Int: Px]
+			var stroke = [idx: pxl.isEven ? sc : pc] as [Int: Px]
 			var front = [pxl] as [PxL]
 			while !front.isEmpty {
 				front = front.flatMap { pxl in
 					pxl.neighbors.compactMap { pxl in
-						document.size.index(at: pxl).flatMap { idx in
-							if stroke[idx] == .none, document.pxs[idx] == c {
-								stroke[idx] = rc
+						file.size.index(at: pxl).flatMap { idx in
+							if stroke[idx] == .none, file.pxs[idx] == c {
+								stroke[idx] = pxl.isEven ? sc : pc
 								return pxl
 							} else {
 								return .none
@@ -66,16 +70,22 @@ private extension EditorView {
 				}
 			}
 			stroke.forEach { idx, px in
-				document.pxs[idx] = px
+				file.pxs[idx] = px
 			}
 		}
 	}
 
 	private func replace(at pxl: PxL) {
-		if let idx = document.size.index(at: pxl) {
-			let c = document.pxs[idx]
-			let rc = state.primaryColor
-			document.pxs = document.pxs.map { px in px == c ? rc : px }
+		if let idx = file.size.index(at: pxl) {
+			let c = file.pxs[idx]
+			let pc = state.primaryColor
+			let sc = state.dither ? state.secondaryColor : pc
+
+			file.pxs = file.pxs.enumerated()
+				.map { [size = file.size] idx, px in
+					let rc = size.pxl(at: idx).isEven ? pc : sc
+					return px == c ? rc : px
+				}
 		}
 	}
 }

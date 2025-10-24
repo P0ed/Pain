@@ -6,17 +6,41 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXFileReference section */
-		5FF2A3B02E8F136C00EA7883 /* Pain.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pain.app; sourceTree = BUILT_PRODUCTS_DIR; };
-/* End PBXFileReference section */
+/* Begin PBXBuildFile section */
+		5F28FCAF2EABDC8100C0A181 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F28FCA42EABDC8100C0A181 /* Assets.xcassets */; };
+		5F28FCB12EABDC8100C0A181 /* CoreGraphics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FC9E2EABDC8100C0A181 /* CoreGraphics.swift */; };
+		5F28FCB22EABDC8100C0A181 /* Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FC9F2EABDC8100C0A181 /* Swift.swift */; };
+		5F28FCB32EABDC8100C0A181 /* SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA02EABDC8100C0A181 /* SwiftUI.swift */; };
+		5F28FCB42EABDC8100C0A181 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA12EABDC8100C0A181 /* UserDefaults.swift */; };
+		5F28FCB52EABDC8100C0A181 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA32EABDC8100C0A181 /* App.swift */; };
+		5F28FCB62EABDC8100C0A181 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA52EABDC8100C0A181 /* Colors.swift */; };
+		5F28FCB72EABDC8100C0A181 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA62EABDC8100C0A181 /* Data.swift */; };
+		5F28FCB82EABDC8100C0A181 /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA72EABDC8100C0A181 /* Document.swift */; };
+		5F28FCB92EABDC8100C0A181 /* Drawing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA82EABDC8100C0A181 /* Drawing.swift */; };
+		5F28FCBA2EABDC8100C0A181 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA92EABDC8100C0A181 /* EditorView.swift */; };
+		5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */; };
+		5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */; };
+		5F28FCBD2EABDC8100C0A181 /* Zooming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAD2EABDC8100C0A181 /* Zooming.swift */; };
+/* End PBXBuildFile section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		5FF2A3B22E8F136C00EA7883 /* Pain */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Pain;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
+/* Begin PBXFileReference section */
+		5F28FC9E2EABDC8100C0A181 /* CoreGraphics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreGraphics.swift; sourceTree = "<group>"; };
+		5F28FC9F2EABDC8100C0A181 /* Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Swift.swift; sourceTree = "<group>"; };
+		5F28FCA02EABDC8100C0A181 /* SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUI.swift; sourceTree = "<group>"; };
+		5F28FCA12EABDC8100C0A181 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		5F28FCA32EABDC8100C0A181 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		5F28FCA42EABDC8100C0A181 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5F28FCA52EABDC8100C0A181 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		5F28FCA62EABDC8100C0A181 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		5F28FCA72EABDC8100C0A181 /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
+		5F28FCA82EABDC8100C0A181 /* Drawing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Drawing.swift; sourceTree = "<group>"; };
+		5F28FCA92EABDC8100C0A181 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
+		5F28FCAA2EABDC8100C0A181 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
+		5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBar.swift; sourceTree = "<group>"; };
+		5F28FCAD2EABDC8100C0A181 /* Zooming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zooming.swift; sourceTree = "<group>"; };
+		5FF2A3B02E8F136C00EA7883 /* Major Paint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Major Paint.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		5FF2A3AD2E8F136C00EA7883 /* Frameworks */ = {
@@ -29,10 +53,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5F28FCA22EABDC8100C0A181 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				5F28FC9E2EABDC8100C0A181 /* CoreGraphics.swift */,
+				5F28FC9F2EABDC8100C0A181 /* Swift.swift */,
+				5F28FCA02EABDC8100C0A181 /* SwiftUI.swift */,
+				5F28FCA12EABDC8100C0A181 /* UserDefaults.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		5F28FCAE2EABDC8100C0A181 /* Major Paint */ = {
+			isa = PBXGroup;
+			children = (
+				5F28FCA22EABDC8100C0A181 /* Extensions */,
+				5F28FCA32EABDC8100C0A181 /* App.swift */,
+				5F28FCA72EABDC8100C0A181 /* Document.swift */,
+				5F28FCA92EABDC8100C0A181 /* EditorView.swift */,
+				5F28FCA52EABDC8100C0A181 /* Colors.swift */,
+				5F28FCA62EABDC8100C0A181 /* Data.swift */,
+				5F28FCA82EABDC8100C0A181 /* Drawing.swift */,
+				5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */,
+				5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */,
+				5F28FCAD2EABDC8100C0A181 /* Zooming.swift */,
+				5F28FCA42EABDC8100C0A181 /* Assets.xcassets */,
+				5F28FCAA2EABDC8100C0A181 /* Info.plist */,
+			);
+			path = "Major Paint";
+			sourceTree = "<group>";
+		};
 		5FF2A3A72E8F136C00EA7883 = {
 			isa = PBXGroup;
 			children = (
-				5FF2A3B22E8F136C00EA7883 /* Pain */,
+				5F28FCAE2EABDC8100C0A181 /* Major Paint */,
 				5FF2A3B12E8F136C00EA7883 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +94,7 @@
 		5FF2A3B12E8F136C00EA7883 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5FF2A3B02E8F136C00EA7883 /* Pain.app */,
+				5FF2A3B02E8F136C00EA7883 /* Major Paint.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +102,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5FF2A3AF2E8F136C00EA7883 /* Pain */ = {
+		5FF2A3AF2E8F136C00EA7883 /* Major Paint */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5FF2A3C42E8F137000EA7883 /* Build configuration list for PBXNativeTarget "Pain" */;
+			buildConfigurationList = 5FF2A3C42E8F137000EA7883 /* Build configuration list for PBXNativeTarget "Major Paint" */;
 			buildPhases = (
 				5FF2A3AC2E8F136C00EA7883 /* Sources */,
 				5FF2A3AD2E8F136C00EA7883 /* Frameworks */,
@@ -60,14 +114,11 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				5FF2A3B22E8F136C00EA7883 /* Pain */,
-			);
-			name = Pain;
+			name = "Major Paint";
 			packageProductDependencies = (
 			);
 			productName = Pain;
-			productReference = 5FF2A3B02E8F136C00EA7883 /* Pain.app */;
+			productReference = 5FF2A3B02E8F136C00EA7883 /* Major Paint.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +136,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5FF2A3AB2E8F136C00EA7883 /* Build configuration list for PBXProject "Pain" */;
+			buildConfigurationList = 5FF2A3AB2E8F136C00EA7883 /* Build configuration list for PBXProject "Major Paint" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +150,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5FF2A3AF2E8F136C00EA7883 /* Pain */,
+				5FF2A3AF2E8F136C00EA7883 /* Major Paint */,
 			);
 		};
 /* End PBXProject section */
@@ -109,6 +160,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F28FCAF2EABDC8100C0A181 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +171,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F28FCB12EABDC8100C0A181 /* CoreGraphics.swift in Sources */,
+				5F28FCB22EABDC8100C0A181 /* Swift.swift in Sources */,
+				5F28FCB32EABDC8100C0A181 /* SwiftUI.swift in Sources */,
+				5F28FCB42EABDC8100C0A181 /* UserDefaults.swift in Sources */,
+				5F28FCB52EABDC8100C0A181 /* App.swift in Sources */,
+				5F28FCB62EABDC8100C0A181 /* Colors.swift in Sources */,
+				5F28FCB72EABDC8100C0A181 /* Data.swift in Sources */,
+				5F28FCB82EABDC8100C0A181 /* Document.swift in Sources */,
+				5F28FCB92EABDC8100C0A181 /* Drawing.swift in Sources */,
+				5F28FCBA2EABDC8100C0A181 /* EditorView.swift in Sources */,
+				5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */,
+				5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */,
+				5F28FCBD2EABDC8100C0A181 /* Zooming.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +329,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Major Paint/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -305,6 +371,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Major Paint/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -328,7 +395,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5FF2A3AB2E8F136C00EA7883 /* Build configuration list for PBXProject "Pain" */ = {
+		5FF2A3AB2E8F136C00EA7883 /* Build configuration list for PBXProject "Major Paint" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5FF2A3C22E8F137000EA7883 /* Debug */,
@@ -337,7 +404,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5FF2A3C42E8F137000EA7883 /* Build configuration list for PBXNativeTarget "Pain" */ = {
+		5FF2A3C42E8F137000EA7883 /* Build configuration list for PBXNativeTarget "Major Paint" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5FF2A3C52E8F137000EA7883 /* Debug */,

@@ -10,6 +10,8 @@ extension EditorView {
 			ToolButton(tool: .replace, state: $state.tool)
 			Spacer()
 			ColorsView(colors: state.colors)
+			Toggle("Dither", isOn: $state.dither)
+				.keyboardShortcut(KeyEquivalent("d"), modifiers: [])
 			Spacer()
 			ColorsView(colors: palette.colors)
 			Spacer()
@@ -41,11 +43,11 @@ struct ColorsView: View {
 
 	var body: some View {
 		ForEach(
-			colors.chunks(ofCount: 2),
-			id: \.hashValue,
-			content: { colors in
+			colors.chunks(ofCount: 2).enumerated(),
+			id: \.offset,
+			content: { _, colors in
 				HStack(spacing: 12.0) {
-					ForEach(colors, id: \.hashValue) { color in
+					ForEach(colors.enumerated(), id: \.offset) { _, color in
 						color.color
 							.frame(width: 48.0, height: 32.0)
 							.border(.thinMaterial, width: 1.0)

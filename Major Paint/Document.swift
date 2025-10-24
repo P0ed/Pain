@@ -1,5 +1,4 @@
 import SwiftUI
-import SpriteKit
 import UniformTypeIdentifiers
 
 struct Document: FileDocument {
@@ -7,15 +6,14 @@ struct Document: FileDocument {
 	var pxs: [Px]
 
 	static var readableContentTypes: [UTType] { [.png] }
-	static var writableContentTypes: [UTType] { [.png] }
 
 	subscript(_ pxl: PxL) -> Px {
-		get { pxs[size.index(at: pxl)!] }
-		set { pxs[size.index(at: pxl)!] = newValue }
+		get { size.index(at: pxl).map { idx in pxs[idx] } ?? .clear }
+		set { size.index(at: pxl).map { idx in pxs[idx] = newValue } }
 	}
 
 	init() {
-		size = PxSize(width: 48, height: 32)
+		size = PxSize(width: 32, height: 32)
         pxs = size.alloc(color: .white)
 	}
 
