@@ -12,5 +12,6 @@ struct PaintApp: App {
 				EditorView(palette: $palette, file: cfg.$document)
 			}
 		)
+		.windowToolbarStyle(.automatic)
 	}
 }

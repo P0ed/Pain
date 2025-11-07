@@ -28,7 +28,7 @@ struct EditorView: View {
 
 	var body: some View {
 		NavigationSplitView(
-			sidebar: { toolBar },
+			sidebar: { sidebar },
 			detail: {
 				ZStack {
 					Image(.backround)
@@ -54,6 +54,7 @@ struct EditorView: View {
 				.gesture(zoomingController)
 			}
 		)
+		.toolbar { toolbar }
 		.focusable()
 		.focused($focused)
 		.focusEffectDisabled()

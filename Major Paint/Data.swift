@@ -110,6 +110,15 @@ extension Tool {
 		}
 	}
 
+	var systemImage: String {
+		switch self {
+		case .pencil: "pencil"
+		case .eraser: "eraser"
+		case .bucket: "paint.bucket.classic"
+		case .replace: "rectangle.2.swap"
+		}
+	}
+
 	var shortcutCharacter: Character {
 		switch self {
 		case .pencil: "p"
