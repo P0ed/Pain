@@ -36,7 +36,7 @@ extension InlineArray {
 		return result
 	}
 
-	mutating func mapInPlace(_ transform: (inout Element) -> ()) {
+	mutating func modifyEach(_ transform: (inout Element) -> ()) {
 		for i in indices { transform(&self[i]) }
 	}
 }
@@ -51,6 +51,13 @@ extension Array {
 		}
 	}
 
+	mutating func modifyEach(_ transform: (inout Element) -> Void) {
+		for i in indices {
+			transform(&self[i])
+		}
+	}
+
+	@available(*, deprecated, message: "Unused function")
 	func chunks(ofCount count: Int) -> [[Element]] {
 		stride(from: 0, to: self.count - 1, by: count).map { idx in
 			stride(from: idx, to: idx + count, by: 1).map { idx in

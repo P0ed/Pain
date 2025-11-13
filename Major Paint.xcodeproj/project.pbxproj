@@ -21,6 +21,7 @@
 		5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */; };
 		5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */; };
 		5F28FCBD2EABDC8100C0A181 /* Zooming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAD2EABDC8100C0A181 /* Zooming.swift */; };
+		5F5FDB082EC63A73003B29BD /* DocumentOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FDB072EC63A6D003B29BD /* DocumentOperations.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBar.swift; sourceTree = "<group>"; };
 		5F28FCAD2EABDC8100C0A181 /* Zooming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zooming.swift; sourceTree = "<group>"; };
+		5F5FDB072EC63A6D003B29BD /* DocumentOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentOperations.swift; sourceTree = "<group>"; };
 		5FF2A3B02E8F136C00EA7883 /* Major Paint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Major Paint.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -70,6 +72,7 @@
 				5F28FCA22EABDC8100C0A181 /* Extensions */,
 				5F28FCA32EABDC8100C0A181 /* App.swift */,
 				5F28FCA72EABDC8100C0A181 /* Document.swift */,
+				5F5FDB072EC63A6D003B29BD /* DocumentOperations.swift */,
 				5F28FCA92EABDC8100C0A181 /* EditorView.swift */,
 				5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */,
 				5F28FCA52EABDC8100C0A181 /* Colors.swift */,
@@ -179,6 +182,7 @@
 				5F28FCB62EABDC8100C0A181 /* Colors.swift in Sources */,
 				5F28FCB72EABDC8100C0A181 /* Data.swift in Sources */,
 				5F28FCB82EABDC8100C0A181 /* Document.swift in Sources */,
+				5F5FDB082EC63A73003B29BD /* DocumentOperations.swift in Sources */,
 				5F28FCB92EABDC8100C0A181 /* Drawing.swift in Sources */,
 				5F28FCBA2EABDC8100C0A181 /* EditorView.swift in Sources */,
 				5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */,
