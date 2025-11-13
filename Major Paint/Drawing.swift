@@ -2,7 +2,7 @@ import SwiftUI
 
 extension EditorView {
 
-	var size: CGSize { file.size.cgSize.zoomed(state.magnification) }
+	var size: CGSize { file.size.cgSize.magnified(state.magnification) }
 
 	func pxl(at location: CGPoint) -> PxL {
 		CGPoint(
@@ -14,12 +14,9 @@ extension EditorView {
 	var drawingController: some Gesture {
 		DragGesture(minimumDistance: 0)
 			.onChanged { gesture in
-				if state.tool.isDraggable || state.drawing.isEmpty {
-					draw(at: pxl(at: gesture.location))
-				}
+				draw(at: pxl(at: gesture.location))
 			}
 			.onEnded { _ in
-				state.drawing = []
 				undoManager?.beginUndoGrouping()
 				undoManager?.setActionName(state.tool.actionName)
 				undoManager?.endUndoGrouping()
@@ -48,31 +45,35 @@ private extension EditorView {
 	}
 
 	private func bucket(at pxl: PxL) {
-		if let idx = file.size.index(at: pxl) {
-			let c = file.pxs[idx]
-			let pc = state.primaryColor
-			let sc = state.dither ? state.secondaryColor : pc
+		let size = file.size
+		var pxs = file.pxs
 
-			var stroke = [idx: pxl.isEven ? sc : pc] as [Int: Px]
-			var front = [pxl] as [PxL]
-			while !front.isEmpty {
-				front = front.flatMap { pxl in
-					pxl.neighbors.compactMap { pxl in
-						file.size.index(at: pxl).flatMap { idx in
-							if stroke[idx] == .none, file.pxs[idx] == c {
-								stroke[idx] = pxl.isEven ? sc : pc
-								return pxl
-							} else {
-								return .none
-							}
+		guard let idx = size.index(at: pxl) else { return }
+
+		let c = pxs[idx]
+		let pc = state.primaryColor
+		let sc = state.dither ? state.secondaryColor : pc
+		pxs[idx] = pxl.isEven ? pc : sc
+
+		var stroke = BitSet(count: size.count)
+		stroke[idx] = true
+		var front = [pxl] as [PxL]
+		while !front.isEmpty {
+			front = front.flatMap { pxl in
+				pxl.neighbors.compactMap { pxl in
+					size.index(at: pxl).flatMap { idx in
+						if !stroke[idx], pxs[idx] == c {
+							pxs[idx] = pxl.isEven ? pc : sc
+							stroke[idx] = true
+							return pxl
+						} else {
+							return .none
 						}
 					}
 				}
 			}
-			stroke.forEach { idx, px in
-				file.pxs[idx] = px
-			}
 		}
+		file.pxs = pxs
 	}
 
 	private func replace(at pxl: PxL) {

@@ -28,7 +28,7 @@ extension PxSize {
 
 extension CGSize {
 
-	func zoomed(_ scale: CGFloat) -> CGSize {
+	func magnified(_ scale: CGFloat) -> CGSize {
 		.init(width: width * scale, height: height * scale)
 	}
 }

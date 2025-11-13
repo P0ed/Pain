@@ -8,7 +8,7 @@ extension EditorView {
 			ToolButton(tool: .eraser, state: $state.tool)
 			ToolButton(tool: .bucket, state: $state.tool)
 			ToolButton(tool: .replace, state: $state.tool)
-			Spacer(minLength: 64.0)
+			Spacer(minLength: 48.0)
 			ActionButton(name: "Make monochrome", image: "sum", shortcut: "G", action: {
 				file.makeMonochrome()
 			})
@@ -49,16 +49,20 @@ struct ActionButton: View {
 extension EditorView {
 
 	var sidebar: some View {
-		VStack(spacing: 12.0) {
-			ColorsView(colors: state.colors)
-			Toggle("Dither", isOn: $state.dither)
-				.keyboardShortcut(KeyEquivalent("d"), modifiers: [])
-			Spacer()
-			ColorsView(colors: palette.colors, didTap: { color in
-				state.primaryColor = color
-			})
-			Spacer()
+		ScrollView(.vertical) {
+			VStack(spacing: 0.0) {
+				ColorsView(colors: state.colors)
+				Toggle("Dither", isOn: $state.dither)
+					.keyboardShortcut(KeyEquivalent("d"), modifiers: [])
+					.padding(8.0)
+				Spacer(minLength: 4.0)
+				ColorsView(colors: palette.colors) { color in
+					state.primaryColor = color
+				}
+			}
+			.padding(.vertical, 12.0)
 		}
+		.scrollIndicators(.never)
 	}
 }
 
@@ -73,8 +77,7 @@ struct ColorsView: View {
 			id: \.offset,
 			content: { _, color in
 				color.color
-					.frame(width: 96.0, height: 24.0)
-					.border(.thinMaterial, width: 1.0)
+					.frame(width: 128.0, height: 24.0)
 					.onTapGesture { didTap(color) }
 			}
 		)

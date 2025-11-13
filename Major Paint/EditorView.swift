@@ -8,7 +8,6 @@ struct EditorState: Hashable {
 	var magnification: CGFloat = 8.0
 	var magnifyGestureState: CGFloat?
 	var size: CGSize = .zero
-	var drawing: Set<PxL> = []
 	var pointer: CGPoint?
 }
 
@@ -37,13 +36,8 @@ struct EditorView: View {
 					GeometryReader { geo in
 						ScrollView([.vertical, .horizontal]) {
 							Canvas { ctx, _ in
-								guard let image = file.image else { return }
 								state.size = geo.size
-
-								ctx.draw(
-									image,
-									in: .init(origin: .zero, size: size)
-								)
+								file.render(in: ctx, size: size)
 							}
 							.frame(width: size.width, height: size.height)
 							.gesture(drawingController)
@@ -51,7 +45,7 @@ struct EditorView: View {
 						}
 					}
 				}
-				.gesture(zoomingController)
+				.gesture(magnificationController)
 			}
 		)
 		.toolbar { toolbar }

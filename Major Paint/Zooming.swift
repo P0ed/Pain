@@ -2,7 +2,7 @@ import SwiftUI
 
 extension EditorView {
 
-	var zoomingController: some Gesture {
+	var magnificationController: some Gesture {
 		MagnifyGesture(minimumScaleDelta: 0)
 			.onChanged { gesture in
 				if state.magnifyGestureState == .none {
