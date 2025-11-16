@@ -30,8 +30,8 @@ extension EditorView {
 
 			case "9": setScale(1.0)
 			case "0": setScale(file.size.zoomToFit(state.size))
-			case "-": setScale(max(0.25, state.magnification / 2.0))
-			case "=": setScale(min(64.0, state.magnification * 2.0))
+			case "-": setScale(state.magnification / 2.0)
+			case "=": setScale(state.magnification * 2.0)
 
 			case "x": state.swapColors()
 

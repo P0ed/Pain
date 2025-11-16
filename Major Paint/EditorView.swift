@@ -16,6 +16,7 @@ struct EditorView: View {
 	@Binding var palette: Palette
 	@Binding var file: Document
 
+	@GestureState var magnifyGestureState: CGFloat?
 	@FocusState private(set) var focused: Bool
 	@Environment(\.undoManager) var undoManager
 
@@ -42,11 +43,10 @@ struct EditorView: View {
 			GeometryReader { geo in
 				Canvas { ctx, size in
 					file.render(in: ctx, size: size)
-					print("render:", size)
+//					print("render:", size)
 				}
 				.gesture(drawingController)
 				.onChange(of: geo.frame(in: .scrollView)) { _, new in
-					print("frame:", new)
 					state.frame = new
 				}
 			}
@@ -55,6 +55,7 @@ struct EditorView: View {
 				height: file.size.cg.height * state.magnification
 			)
 		}
+		.gesture(magnificationController)
 		.scrollPosition($state.scrollPosition)
 		.background {
 			GeometryReader { geo in
@@ -67,14 +68,41 @@ struct EditorView: View {
 	}
 
 	func setScale(_ magnification: CGFloat) {
-		let offset = CGPoint(
-			x: state.frame.midX,
-			y: state.frame.midY
+		let magnification = min(max(magnification, 0.25), 64.0)
+		let frame = state.frame
+		let size = state.size
+		let dm = magnification / state.magnification
+		let ds = CGVector(
+			dx: frame.width - size.width,
+			dy: frame.height - size.height
 		)
-		print("offset:", offset)
+		let progress = CGVector(
+			dx: ds.dx > 0.0 ? (size.width * 0.5 - frame.minX) / frame.width : 0.5,
+			dy: ds.dy > 0.0 ? (size.height * 0.5 - frame.minY) / frame.height : 0.5,
+		)
+		let offset = CGPoint(
+			x: (frame.width * dm - size.width) * progress.dx,
+			y: (frame.height * dm - size.height) * progress.dy
+		)
+		print("frame:", frame)
+		print("size:", size)
+		print("progress:", progress)
+		print("new offset:", offset)
 		modify(&state) { state in
 			state.magnification = magnification
 			state.scrollPosition = .init(point: offset)
 		}
+	}
+}
+
+extension EditorView {
+
+	var magnificationController: some Gesture {
+		MagnifyGesture(minimumScaleDelta: 0)
+			.updating($magnifyGestureState) { gesture, initial, _ in
+				if initial == .none { initial = state.magnification }
+				let initial = initial ?? state.magnification
+				setScale(initial * gesture.magnification)
+			}
 	}
 }
