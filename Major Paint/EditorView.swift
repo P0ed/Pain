@@ -55,8 +55,8 @@ struct EditorView: View {
 				height: file.size.cg.height * state.magnification
 			)
 		}
-		.gesture(magnificationController)
 		.scrollPosition($state.scrollPosition)
+		.gesture(magnificationController)
 		.background {
 			GeometryReader { geo in
 				Image(.background).resizable(resizingMode: .tile)
@@ -81,23 +81,16 @@ struct EditorView: View {
 			dy: ds.dy > 0.0 ? (size.height * 0.5 - frame.minY) / frame.height : 0.5,
 		)
 		let offset = CGPoint(
-			x: (frame.width * dm - size.width) * progress.dx,
-			y: (frame.height * dm - size.height) * progress.dy
+			x: (frame.width * dm * progress.dx - size.width * 0.5),
+			y: (frame.height * dm * progress.dy - size.height * 0.5)
 		)
-		print("frame:", frame)
-		print("size:", size)
-		print("progress:", progress)
-		print("new offset:", offset)
 		modify(&state) { state in
 			state.magnification = magnification
 			state.scrollPosition = .init(point: offset)
 		}
 	}
-}
 
-extension EditorView {
-
-	var magnificationController: some Gesture {
+	private var magnificationController: some Gesture {
 		MagnifyGesture(minimumScaleDelta: 0)
 			.updating($magnifyGestureState) { gesture, initial, _ in
 				if initial == .none { initial = state.magnification }
