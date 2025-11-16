@@ -2,15 +2,10 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct Document: FileDocument {
-	var size: PxSize
+	private(set) var size: PxSize
 	var pxs: [Px]
 
 	static var readableContentTypes: [UTType] { [.png] }
-
-	subscript(_ pxl: PxL) -> Px {
-		get { size.index(at: pxl).map { idx in pxs[idx] } ?? .clear }
-		set { size.index(at: pxl).map { idx in pxs[idx] = newValue } }
-	}
 
 	init() {
 		size = PxSize(width: 32, height: 32)
@@ -25,8 +20,26 @@ struct Document: FileDocument {
 			.unwrap("Failed to open image")
 
 		size = PxSize(width: image.width, height: image.height)
-        pxs = size.alloc(color: .clear)
+        pxs = size.alloc()
+		draw(images: [image])
+	}
 
+	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+		try FileWrapper(
+			regularFileWithContents: NSBitmapImageRep(cgImage: image
+				.unwrap("Failed to create CGImage")
+			)
+			.representation(using: .png, properties: [:])
+			.unwrap("Failed to create PNG representation")
+		)
+	}
+
+	subscript(_ pxl: PxL) -> Px {
+		get { size.index(at: pxl).map { idx in pxs[idx] } ?? .clear }
+		set { size.index(at: pxl).map { idx in pxs[idx] = newValue } }
+	}
+
+	mutating func draw(images: [CGImage]) {
 		pxs.withUnsafeMutableBytes { [size] ptr in
 			let colorSpace = CGColorSpaceCreateDeviceRGB()
 			if let ctx = CGContext(
@@ -39,21 +52,15 @@ struct Document: FileDocument {
 				bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
 			) {
 				ctx.interpolationQuality = .none
-				ctx.draw(image, in: CGRect(origin: .zero, size: size.cgSize))
+				images.forEach { img in
+					ctx.draw(img, in: CGRect(origin: .zero, size: size.cg))
+				}
 			}
 		}
 	}
 
-	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-		try FileWrapper(
-			regularFileWithContents: NSBitmapImageRep(cgImage: cgImage())
-				.representation(using: .png, properties: [:])
-				.unwrap("Failed to create PNG representation")
-		)
-	}
-
-	func cgImage() throws -> CGImage {
-		try pxs.withUnsafeBytes { raw in
+	var image: CGImage? {
+		try? pxs.withUnsafeBytes { raw in
 			let bytes = raw.bindMemory(to: UInt8.self)
 			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
 				.unwrap("Can't make CFData")

@@ -1,6 +1,16 @@
 func id<A>(_ x: A) -> A { x }
 func ø<each A>(_ x: repeat each A) {}
 
+func modify<A>(_ value: inout A, _ transform: (inout A) -> Void) {
+	transform(&value)
+}
+
+func modifying<A>(_ value: A, _ transform: (inout A) -> Void) -> A {
+	var value = value
+	transform(&value)
+	return value
+}
+
 extension Optional {
 
 	func unwrap(_ fallback: @autoclosure () -> Error) throws -> Wrapped {

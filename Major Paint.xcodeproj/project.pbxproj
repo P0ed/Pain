@@ -20,7 +20,6 @@
 		5F28FCBA2EABDC8100C0A181 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCA92EABDC8100C0A181 /* EditorView.swift */; };
 		5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */; };
 		5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */; };
-		5F28FCBD2EABDC8100C0A181 /* Zooming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAD2EABDC8100C0A181 /* Zooming.swift */; };
 		5F5FDB082EC63A73003B29BD /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FDB072EC63A6D003B29BD /* Operations.swift */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +38,6 @@
 		5F28FCAA2EABDC8100C0A181 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBar.swift; sourceTree = "<group>"; };
-		5F28FCAD2EABDC8100C0A181 /* Zooming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zooming.swift; sourceTree = "<group>"; };
 		5F5FDB072EC63A6D003B29BD /* Operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operations.swift; sourceTree = "<group>"; };
 		5FF2A3B02E8F136C00EA7883 /* Major Paint.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Major Paint.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -79,7 +77,6 @@
 				5F28FCA62EABDC8100C0A181 /* Data.swift */,
 				5F28FCA82EABDC8100C0A181 /* Drawing.swift */,
 				5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */,
-				5F28FCAD2EABDC8100C0A181 /* Zooming.swift */,
 				5F28FCA42EABDC8100C0A181 /* Assets.xcassets */,
 				5F28FCAA2EABDC8100C0A181 /* Info.plist */,
 			);
@@ -187,7 +184,6 @@
 				5F28FCBA2EABDC8100C0A181 /* EditorView.swift in Sources */,
 				5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */,
 				5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */,
-				5F28FCBD2EABDC8100C0A181 /* Zooming.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

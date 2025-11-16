@@ -2,13 +2,19 @@ import SwiftUI
 
 extension EditorView {
 
-	var toolbar: some View {
-		HStack {
+	@ToolbarContentBuilder
+	var toolbar: some ToolbarContent {
+		ToolbarItemGroup {
 			ToolButton(tool: .pencil, state: $state.tool)
+			ToolButton(tool: .picker, state: $state.tool)
 			ToolButton(tool: .eraser, state: $state.tool)
 			ToolButton(tool: .bucket, state: $state.tool)
 			ToolButton(tool: .replace, state: $state.tool)
-			Spacer(minLength: 48.0)
+		}
+		ToolbarItemGroup {
+			Spacer()
+		}
+		ToolbarItemGroup {
 			ActionButton(name: "Make monochrome", image: "sum", shortcut: "G", action: {
 				file.makeMonochrome()
 			})
@@ -76,7 +82,7 @@ struct ColorsView: View {
 			colors.enumerated(),
 			id: \.offset,
 			content: { _, color in
-				color.color
+				color.ui
 					.frame(width: 128.0, height: 24.0)
 					.onTapGesture { didTap(color) }
 			}

@@ -2,7 +2,7 @@ import SwiftUI
 
 extension Px {
 
-	var color: Color {
+	var ui: Color {
 		Color(
 			.displayP3,
 			red: Double(red) / 255.0,
@@ -13,16 +13,9 @@ extension Px {
 	}
 }
 
-extension Document {
+extension CGImage {
 
-	var image: Image? {
-		try? Image(decorative: cgImage(), scale: 1.0).interpolation(.none)
-	}
-}
-
-extension HoverPhase {
-
-	var location: CGPoint? {
-		if case .active(let location) = self { location } else { .none }
+	var ui: Image {
+		Image(decorative: self, scale: 1.0).interpolation(.none)
 	}
 }

@@ -2,12 +2,10 @@ import SwiftUI
 
 extension EditorView {
 
-	var size: CGSize { file.size.cgSize.magnified(state.magnification) }
-
 	func pxl(at location: CGPoint) -> PxL {
 		CGPoint(
 			x: location.x / state.magnification,
-			y: file.size.cgSize.height - location.y / state.magnification
+			y: file.size.cg.height - location.y / state.magnification
 		).pxl
 	}
 
@@ -17,6 +15,7 @@ extension EditorView {
 				draw(at: pxl(at: gesture.location))
 			}
 			.onEnded { _ in
+				guard state.tool != .picker else { return }
 				undoManager?.beginUndoGrouping()
 				undoManager?.setActionName(state.tool.actionName)
 				undoManager?.endUndoGrouping()
@@ -35,6 +34,7 @@ private extension EditorView {
 		case .eraser: pencil(.clear, at: pxl)
 		case .bucket: bucket(at: pxl)
 		case .replace: replace(at: pxl)
+		case .picker: state.primaryColor = file[pxl]
 		}
 	}
 

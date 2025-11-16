@@ -1,7 +1,7 @@
 import CoreGraphics
 
 extension PxSize {
-	var cgSize: CGSize { CGSize(width: width, height: height) }
+	var cg: CGSize { CGSize(width: width, height: height) }
 	var center: CGPoint { CGPoint(x: width / 2, y: height / 2) }
 	var count: Int { width * height }
 
@@ -17,7 +17,7 @@ extension PxSize {
 		PxL(x: index % width, y: index / width)
 	}
 
-    func alloc(color: Px) -> [Px] {
+	func alloc(color: Px = .clear) -> [Px] {
         .init(repeating: color, count: count)
     }
 
@@ -28,8 +28,8 @@ extension PxSize {
 
 extension CGSize {
 
-	func magnified(_ scale: CGFloat) -> CGSize {
-		.init(width: width * scale, height: height * scale)
+	static func * (_ size: CGSize, _ scale: CGFloat) -> CGSize {
+		CGSize(width: size.width * scale, height: size.height * scale)
 	}
 }
 

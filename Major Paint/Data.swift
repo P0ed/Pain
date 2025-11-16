@@ -30,7 +30,7 @@ struct PxSize: Hashable {
 }
 
 enum Tool {
-	case pencil, eraser, bucket, replace
+	case pencil, eraser, bucket, replace, picker
 }
 
 struct Px: Hashable, Codable {
@@ -107,6 +107,7 @@ extension Tool {
 		case .eraser: "Erase"
 		case .bucket: "Bucket"
 		case .replace: "Replace"
+		case .picker: "Pick color"
 		}
 	}
 
@@ -116,6 +117,7 @@ extension Tool {
 		case .eraser: "eraser"
 		case .bucket: "paint.bucket.classic"
 		case .replace: "rectangle.2.swap"
+		case .picker: "eyedropper"
 		}
 	}
 
@@ -125,6 +127,7 @@ extension Tool {
 		case .eraser: "e"
 		case .bucket: "b"
 		case .replace: "r"
+		case .picker: "i"
 		}
 	}
 }
