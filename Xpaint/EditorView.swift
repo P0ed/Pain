@@ -8,7 +8,7 @@ struct EditorState: Equatable {
 	var size: CGSize = .zero
 	var frame: CGRect = .zero
 	var scrollPosition: ScrollPosition = .init(point: .zero)
-	var magnification: CGFloat = 8.0
+	var magnification: CGFloat = 1.0
 }
 
 struct EditorView: View {
@@ -43,7 +43,6 @@ struct EditorView: View {
 			GeometryReader { geo in
 				Canvas { ctx, size in
 					file.render(in: ctx, size: size)
-//					print("render:", size)
 				}
 				.gesture(drawingController)
 				.onChange(of: geo.frame(in: .scrollView)) { _, new in
@@ -57,13 +56,21 @@ struct EditorView: View {
 		}
 		.scrollPosition($state.scrollPosition)
 		.gesture(magnificationController)
-		.background {
-			GeometryReader { geo in
-				Image(.background).resizable(resizingMode: .tile)
-					.onChange(of: geo.size) { _, new in
-						state.size = new
+		.background { background }
+	}
+
+	private var background: some View {
+		GeometryReader { geo in
+			Image(.background).resizable(resizingMode: .tile)
+				.onChange(of: geo.size) { _, new in
+					guard new.width != 0.0, new.height != 0.0 else { return }
+
+					let old = state.size
+					state.size = new
+					if old == .zero {
+						setScale(file.size.zoomToFit(state.size))
 					}
-			}
+				}
 		}
 	}
 
