@@ -1,6 +1,6 @@
 import CoreGraphics
 
-extension PxSize {
+extension CanvasSize {
 	var cg: CGSize { CGSize(width: width, height: height) }
 	var center: CGPoint { CGPoint(x: width / 2, y: height / 2) }
 	var count: Int { width * height }
@@ -14,11 +14,15 @@ extension PxSize {
 	}
 
 	func pxl(at index: Int) -> PxL {
-		PxL(x: index % width, y: index / width)
+		PxL(
+			x: index % count % width,
+			y: index % count / width,
+			z: index / count
+		)
 	}
 
 	func alloc(color: Px = .clear) -> [Px] {
-        .init(repeating: color, count: count)
+        .init(repeating: color, count: count * layers)
     }
 
 	func zoomToFit(_ size: CGSize) -> CGFloat {
@@ -31,9 +35,4 @@ extension CGSize {
 	static func * (_ size: CGSize, _ scale: CGFloat) -> CGSize {
 		CGSize(width: size.width * scale, height: size.height * scale)
 	}
-}
-
-extension CGPoint {
-
-	var pxl: PxL { PxL(x: Int(x), y: Int(y)) }
 }

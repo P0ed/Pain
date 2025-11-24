@@ -3,10 +3,11 @@ import SwiftUI
 extension EditorView {
 
 	func pxl(at location: CGPoint) -> PxL {
-		CGPoint(
-			x: location.x / state.magnification,
-			y: file.size.cg.height - location.y / state.magnification
-		).pxl
+		PxL(
+			x: Int(location.x / state.magnification),
+			y: Int(file.size.cg.height - location.y / state.magnification),
+			z: state.layer
+		)
 	}
 
 	var drawingController: some Gesture {

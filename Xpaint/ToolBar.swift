@@ -4,6 +4,16 @@ extension EditorView {
 
 	@ToolbarContentBuilder
 	var toolbar: some ToolbarContent {
+		if ContentType.type == .pxd {
+			ToolbarItemGroup {
+				ForEach(0..<4) { idx in
+					LayerButton(index: idx, state: $state.layer)
+				}
+			}
+			ToolbarItemGroup {
+				Spacer()
+			}
+		}
 		ToolbarItemGroup {
 			ToolButton(tool: .pencil, state: $state.tool)
 			ToolButton(tool: .picker, state: $state.tool)
@@ -15,15 +25,24 @@ extension EditorView {
 			Spacer()
 		}
 		ToolbarItemGroup {
-			ActionButton(name: "Make monochrome", image: "sum", shortcut: "G", action: {
+			ActionButton(name: "Make monochrome", image: "sum", shortcut: "G") {
 				file.makeMonochrome()
-			})
-			ActionButton(name: "Shift left", image: "chevron.left.2", shortcut: "<", action: {
+			}
+			ActionButton(name: "Shift left", image: "chevron.left.2", shortcut: "<") {
 				file.shiftLeft()
-			})
-			ActionButton(name: "Shift right", image: "chevron.right.2", shortcut: ">", action: {
+			}
+			ActionButton(name: "Shift right", image: "chevron.right.2", shortcut: ">") {
 				file.shiftRight()
-			})
+			}
+			ActionButton(
+				name: "Export",
+				image: "square.and.arrow.up",
+				shortcut: "E",
+				modifiers: .command
+			) {
+				export.document = Document(converting: file)
+				export.exporting = true
+			}
 		}
 	}
 }
@@ -44,48 +63,29 @@ struct ActionButton: View {
 	var name: String
 	var image: String
 	var shortcut: Character
+	var modifiers: EventModifiers = []
 	var action: () -> Void
 
 	var body: some View {
 		Button(name, systemImage: image, action: action)
-			.keyboardShortcut(KeyEquivalent(shortcut), modifiers: [])
+			.keyboardShortcut(KeyEquivalent(shortcut), modifiers: modifiers)
 	}
 }
 
-extension EditorView {
+struct LayerButton: View {
+	var index: Int
+	@Binding
+	var state: Int
 
-	var sidebar: some View {
-		ScrollView(.vertical) {
-			VStack(spacing: 0.0) {
-				ColorsView(colors: state.colors)
-				Toggle("Dither", isOn: $state.dither)
-					.keyboardShortcut(KeyEquivalent("d"), modifiers: [])
-					.padding(8.0)
-				Spacer(minLength: 4.0)
-				ColorsView(colors: palette.colors) { color in
-					state.primaryColor = color
-				}
-			}
-			.padding(.vertical, 12.0)
-		}
-		.scrollIndicators(.never)
-	}
-}
+	static let names: [String] = ["a", "b", "c", "d"]
 
-
-struct ColorsView: View {
-	var colors: [Px]
-	var didTap: (Px) -> Void = ø
+	var name: String { Self.names[index & 0b11] }
 
 	var body: some View {
-		ForEach(
-			colors.enumerated(),
-			id: \.offset,
-			content: { _, color in
-				color.ui
-					.frame(width: 128.0, height: 24.0)
-					.onTapGesture { didTap(color) }
-			}
-		)
+		Button("layer \(name.uppercased())", systemImage: "\(name).square.fill", action: {
+			state = index
+		})
+		.foregroundStyle(state == index ? Color.accent : .primary)
+		.keyboardShortcut(.init(name.first!), modifiers: .control)
 	}
 }

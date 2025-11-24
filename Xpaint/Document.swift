@@ -1,15 +1,44 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct Document: FileDocument {
-	private(set) var size: PxSize
+protocol TypeProvider {
+	static var type: UTType { get }
+	associatedtype ExportType: TypeProvider
+}
+
+enum PXD: TypeProvider {
+	static var type: UTType { .pxd }
+	typealias ExportType = PNG
+}
+
+enum PNG: TypeProvider {
+	static var type: UTType { .png }
+	typealias ExportType = PXD
+}
+
+struct Document<ContentType: TypeProvider>: FileDocument {
+	private(set) var size: CanvasSize
 	var pxs: [Px]
 
-	static var readableContentTypes: [UTType] { [.png] }
+	static var readableContentTypes: [UTType] { [ContentType.type] }
 
 	init() {
-		size = PxSize(width: 32, height: 32)
+		size = CanvasSize(width: 32, height: 32, hasLayers: ContentType.type == .pxd)
         pxs = size.alloc(color: .white)
+	}
+
+	init<T: TypeProvider>(converting file: Document<T>) where T.ExportType == ContentType {
+		size = CanvasSize(
+			width: file.size.width,
+			height: file.size.height,
+			hasLayers: ContentType.type == .pxd
+		)
+		if ContentType.type == .pxd {
+			pxs = file.pxs + .init(repeating: .clear, count: file.size.count * 3)
+		} else {
+			// TODO: Blend all layers into one
+			pxs = Array(file.pxs.prefix(file.size.count))
+		}
 	}
 
 	init(configuration: ReadConfiguration) throws {
@@ -19,19 +48,33 @@ struct Document: FileDocument {
 		let image = try (NSBitmapImageRep(data: data)?.cgImage)
 			.unwrap("Failed to open image")
 
-		size = PxSize(width: image.width, height: image.height)
+		if ContentType.type == .png {
+			size = CanvasSize(
+				width: image.width,
+				height: image.height,
+				hasLayers: false
+			)
+		} else {
+			guard image.height & 0b11 == 0 else { throw Err("Corrupted file") }
+			size = CanvasSize(
+				width: image.width,
+				height: image.height >> 2,
+				hasLayers: true
+			)
+		}
         pxs = size.alloc()
-		draw(images: [image])
+		draw(image)
 	}
 
 	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-		try FileWrapper(
-			regularFileWithContents: NSBitmapImageRep(cgImage: image
-				.unwrap("Failed to create CGImage")
-			)
+		let cgImage = try image
+			.unwrap("Failed to create CGImage")
+
+		let data = try NSBitmapImageRep(cgImage: cgImage)
 			.representation(using: .png, properties: [:])
 			.unwrap("Failed to create PNG representation")
-		)
+
+		return FileWrapper(regularFileWithContents: data)
 	}
 
 	subscript(_ pxl: PxL) -> Px {
@@ -43,27 +86,28 @@ struct Document: FileDocument {
 		}
 	}
 
-	mutating func draw(images: [CGImage]) {
-		pxs.withUnsafeMutableBytes { [size] ptr in
+	private mutating func draw(_ image: CGImage) {
+		pxs.withUnsafeMutableBytes { ptr in
 			let colorSpace = CGColorSpaceCreateDeviceRGB()
 			if let ctx = CGContext(
 				data: ptr.baseAddress,
-				width: size.width,
-				height: size.height,
+				width: image.width,
+				height: image.height,
 				bitsPerComponent: 8,
-				bytesPerRow: size.width * 4,
+				bytesPerRow: image.width * 4,
 				space: colorSpace,
 				bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
 			) {
 				ctx.interpolationQuality = .none
-				images.forEach { img in
-					ctx.draw(img, in: CGRect(origin: .zero, size: size.cg))
-				}
+				ctx.draw(image, in: CGRect(
+					origin: .zero,
+					size: CGSize(width: image.width, height: image.height)
+				))
 			}
 		}
 	}
 
-	var image: CGImage? {
+	private var image: CGImage? {
 		try? pxs.withUnsafeBytes { raw in
 			let bytes = raw.bindMemory(to: UInt8.self)
 			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
@@ -75,7 +119,7 @@ struct Document: FileDocument {
 
 			return try CGImage(
 				width: size.width,
-				height: size.height,
+				height: size.height * size.layers,
 				bitsPerComponent: 8,
 				bitsPerPixel: 32,
 				bytesPerRow: size.width * 4,
@@ -88,5 +132,17 @@ struct Document: FileDocument {
 			)
 			.unwrap("Can't make CGImage")
 		}
+	}
+
+	func render(in context: GraphicsContext, size: CGSize) {
+		guard let image else { return }
+		context.draw(image.ui, in: CGRect(origin: .zero, size: size))
+	}
+}
+
+extension UTType {
+
+	static var pxd: Self {
+		UTType("p0.xpaint.pxd")!
 	}
 }

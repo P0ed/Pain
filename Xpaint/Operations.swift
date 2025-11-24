@@ -2,11 +2,6 @@ import SwiftUI
 
 extension Document {
 
-	func render(in context: GraphicsContext, size: CGSize) {
-		guard let image else { return }
-		context.draw(image.ui, in: CGRect(origin: .zero, size: size))
-	}
-
 	mutating func shiftLeft() {
 		pxs.modifyEach { px in
 			px.red <<= 1

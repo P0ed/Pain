@@ -7,11 +7,19 @@ struct PaintApp: App {
 
 	var body: some Scene {
 		DocumentGroup(
-			newDocument: Document(),
+			newDocument: Document<PXD>(),
 			editor: { cfg in
 				EditorView(palette: $palette, file: cfg.$document)
 			}
 		)
-		.windowToolbarStyle(.automatic)
+		.windowToolbarStyle(.unified)
+
+		DocumentGroup(
+			newDocument: Document<PNG>(),
+			editor: { cfg in
+				EditorView(palette: $palette, file: cfg.$document)
+			}
+		)
+		.windowToolbarStyle(.unified)
 	}
 }

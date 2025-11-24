@@ -1,21 +1,25 @@
+/// Pixel location
 struct PxL: Hashable {
     private var _x: Int16
     private var _y: Int16
+	private var _z: Int8
 
     var x: Int { Int(_x) }
     var y: Int { Int(_y) }
+	var z: Int { Int(_z) }
 
-    init(x: Int, y: Int) {
+	init(x: Int, y: Int, z: Int) {
         _x = Int16(x)
         _y = Int16(y)
+		_z = Int8(z & 0b11)
     }
 
 	var neighbors: [4 of PxL] {
 		[
-			.init(x: x - 1, y: y),
-			.init(x: x + 1, y: y),
-			.init(x: x, y: y - 1),
-			.init(x: x, y: y + 1),
+			.init(x: x - 1, y: y, z: z),
+			.init(x: x + 1, y: y, z: z),
+			.init(x: x, y: y - 1, z: z),
+			.init(x: x, y: y + 1, z: z),
 		]
 	}
 
@@ -24,9 +28,20 @@ struct PxL: Hashable {
 	}
 }
 
-struct PxSize: Hashable {
-	var width: Int
-	var height: Int
+struct CanvasSize: Hashable {
+	private var _width: UInt16
+	private var _height: UInt16
+	private var _hasLayers: Bool
+
+	var width: Int { Int(_width) }
+	var height: Int { Int(_height) }
+	var layers: Int { _hasLayers ? 4 : 1 }
+
+	init(width: Int, height: Int, hasLayers: Bool) {
+		_width = UInt16(width)
+		_height = UInt16(height)
+		_hasLayers = hasLayers
+	}
 }
 
 enum Tool {
@@ -79,17 +94,6 @@ extension EditorState {
 	}
 
 	var colors: [Px] { [primaryColor, secondaryColor] }
-}
-
-extension PxSize {
-
-	func forEach(_ fn: (PxL) -> Void) {
-		(0..<height).forEach { y in
-			(0..<width).forEach { x in
-				fn(PxL(x: x, y: y))
-			}
-		}
-	}
 }
 
 extension Tool {
