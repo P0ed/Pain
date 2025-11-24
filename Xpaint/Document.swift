@@ -35,8 +35,12 @@ struct Document: FileDocument {
 	}
 
 	subscript(_ pxl: PxL) -> Px {
-		get { size.index(at: pxl).map { idx in pxs[idx] } ?? .clear }
-		set { size.index(at: pxl).map { idx in pxs[idx] = newValue } }
+		get {
+			size.index(at: pxl).map { idx in pxs[idx] } ?? .clear
+		}
+		set {
+			size.index(at: pxl).map { idx in pxs[idx] = newValue }
+		}
 	}
 
 	mutating func draw(images: [CGImage]) {

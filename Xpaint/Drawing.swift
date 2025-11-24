@@ -27,10 +27,7 @@ private extension EditorView {
 
 	func draw(at pxl: PxL) {
 		switch state.tool {
-		case .pencil: pencil(
-			state.dither && pxl.isEven ? state.secondaryColor : state.primaryColor,
-			at: pxl
-		)
+		case .pencil: pencil(at: pxl)
 		case .eraser: pencil(.clear, at: pxl)
 		case .bucket: bucket(at: pxl)
 		case .replace: replace(at: pxl)
@@ -38,7 +35,8 @@ private extension EditorView {
 		}
 	}
 
-	private func pencil(_ px: Px, at pxl: PxL) {
+	private func pencil(_ px: Px? = .none, at pxl: PxL) {
+		let px = px ?? (state.dither && pxl.isEven ? state.secondaryColor : state.primaryColor)
 		if let idx = file.size.index(at: pxl) {
 			file.pxs[idx] = px
 		}

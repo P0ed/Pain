@@ -39,11 +39,11 @@ extension InlineArray {
 	var array: [Element] { map(id) }
 
 	func map<Mapped>(_ transform: (Element) -> Mapped) -> [Mapped] {
-		var result = [] as [Mapped]
-		result.reserveCapacity(count)
-		for i in indices { result.append(transform(self[i])) }
+		indices.map { i in transform(self[i]) }
+	}
 
-		return result
+	func compactMap<Mapped>(_ transform: (Element) -> Mapped?) -> [Mapped] {
+		indices.compactMap { i in transform(self[i]) }
 	}
 
 	mutating func modifyEach(_ transform: (inout Element) -> ()) {

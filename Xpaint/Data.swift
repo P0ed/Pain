@@ -1,16 +1,16 @@
 struct PxL: Hashable {
     private var _x: Int16
     private var _y: Int16
-    
+
     var x: Int { Int(_x) }
     var y: Int { Int(_y) }
-    
+
     init(x: Int, y: Int) {
         _x = Int16(x)
         _y = Int16(y)
     }
 
-	var neighbors: [PxL] {
+	var neighbors: [4 of PxL] {
 		[
 			.init(x: x - 1, y: y),
 			.init(x: x + 1, y: y),
