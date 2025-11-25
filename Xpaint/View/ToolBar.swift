@@ -29,33 +29,28 @@ extension EditorView {
 				name: "Make monochrome",
 				image: "sum",
 				shortcut: "G",
-				modifiers: .command
-			) {
-				file.makeMonochrome()
-			}
+				modifiers: .command,
+				action: makeMonochrome
+			)
 			ActionButton(
 				name: "Shift left",
 				image: "chevron.left.2",
-				shortcut: "<"
-			) {
-				file.shiftLeft()
-			}
+				shortcut: "<",
+				action: shiftLeft
+			)
 			ActionButton(
 				name: "Shift right",
 				image: "chevron.right.2",
-				shortcut: ">"
-			) {
-				file.shiftRight()
-			}
+				shortcut: ">",
+				action: shiftRight
+			)
 			ActionButton(
 				name: "Export",
 				image: "square.and.arrow.up",
 				shortcut: "E",
-				modifiers: .command
-			) {
-				export.document = Document(converting: file)
-				export.exporting = true
-			}
+				modifiers: .command,
+				action: exportFile
+			)
 		}
 	}
 }

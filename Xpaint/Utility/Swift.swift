@@ -96,3 +96,17 @@ extension InlineArray: @retroactive Codable where Element: Codable {
 		try container.encode(array)
 	}
 }
+
+@propertyWrapper
+final class Heap<A> {
+	private var storage: A
+
+	init(wrappedValue: A) {
+		storage = wrappedValue
+	}
+
+	var wrappedValue: A {
+		get { storage }
+		set { storage = newValue }
+	}
+}

@@ -1,29 +1,33 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import Accelerate
 
 struct Document<ContentType: TypeProvider>: FileDocument {
-	private(set) var size: CanvasSize
-	var pxs: [Px]
+	var size: Size
+	var layers: [4 of PixelBuffer<Interleaved8x4>]
+	@Heap
+	var registers: [2 of PixelBuffer<Interleaved8x4>]
 
 	static var readableContentTypes: [UTType] { [ContentType.type] }
+	static var hasLayers: Bool { ContentType.type == .pxd }
 
 	init() {
-		size = CanvasSize(width: 32, height: 32, hasLayers: ContentType.type == .pxd)
-        pxs = size.alloc(color: .clear)
+		size = Size(width: 32, height: 32)
+		layers = .init(repeating: .init(size: size))
+		registers = .init(repeating: .init(size: size))
 	}
 
 	init<T: TypeProvider>(converting file: Document<T>) where T.ExportType == ContentType {
-		size = CanvasSize(
-			width: file.size.width,
-			height: file.size.height,
-			hasLayers: ContentType.type == .pxd
-		)
+		size = file.size
 		if ContentType.type == .pxd {
-			pxs = file.pxs + .init(repeating: .clear, count: file.size.count * 3)
+			layers = file.layers
 		} else {
-			// TODO: Blend all layers into one
-			pxs = Array(file.pxs.prefix(file.size.count))
+			layers = file.layers
+			layers[0].merge(layers[1])
+			layers[0].merge(layers[2])
+			layers[0].merge(layers[3])
 		}
+		registers = .init(repeating: .init(size: size))
 	}
 
 	init(configuration: ReadConfiguration) throws {
@@ -34,21 +38,20 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 			.throwing("Failed to open image")
 
 		if ContentType.type == .png {
-			size = CanvasSize(
+			size = Size(
 				width: image.width,
-				height: image.height,
-				hasLayers: false
+				height: image.height
 			)
 		} else {
 			guard image.height & 0b11 == 0 else { throw Err("Corrupted file") }
 
-			size = CanvasSize(
+			size = Size(
 				width: image.width,
-				height: image.height >> 2,
-				hasLayers: true
+				height: image.height >> 2
 			)
 		}
-        pxs = size.alloc()
+		registers = .init(repeating: .init(size: size))
+		layers = .init(repeating: .init(size: size))
 		draw(image)
 	}
 
@@ -65,96 +68,76 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 
 	subscript(_ pxl: PxL) -> Px {
 		get {
-			size.index(at: pxl).map { idx in pxs[idx] } ?? .clear
+			size.index(at: pxl).map { idx in
+				layers[pxl.z].withPixels { pxs in
+					pxs[idx]
+				}
+			} ?? .clear
 		}
 		set {
-			size.index(at: pxl).map { idx in pxs[idx] = newValue }
+			size.index(at: pxl).map { idx in
+				layers[pxl.z].withMutablePixels { pxs in
+					pxs[idx] = newValue
+				}
+			}
 		}
 	}
 
 	private mutating func draw(_ image: CGImage) {
-		pxs.withUnsafeMutableBytes { ptr in
-			let colorSpace = CGColorSpaceCreateDeviceRGB()
-			if let ctx = CGContext(
-				data: ptr.baseAddress,
-				width: image.width,
-				height: image.height,
-				bitsPerComponent: 8,
-				bytesPerRow: image.width * 4,
-				space: colorSpace,
-				bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-			) {
-				ctx.interpolationQuality = .none
-				ctx.draw(image, in: CGRect(
-					origin: .zero,
-					size: CGSize(width: image.width, height: image.height)
-				))
-			}
-		}
+//		pxs.withUnsafeMutableBytes { ptr in
+//			let colorSpace = CGColorSpaceCreateDeviceRGB()
+//			if let ctx = CGContext(
+//				data: ptr.baseAddress,
+//				width: image.width,
+//				height: image.height,
+//				bitsPerComponent: 8,
+//				bytesPerRow: image.width * 4,
+//				space: colorSpace,
+//				bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+//			) {
+//				ctx.interpolationQuality = .none
+//				ctx.draw(image, in: CGRect(
+//					origin: .zero,
+//					size: CGSize(width: image.width, height: image.height)
+//				))
+//			}
+//		}
 	}
 
 	private var exportImage: CGImage? {
-		try? pxs.withUnsafeBytes { raw in
-			let bytes = raw.bindMemory(to: UInt8.self)
-			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
-				.throwing("Can't make CFData")
-			let provider = try CGDataProvider(data: data)
-				.throwing("Can't make CGDataProvider")
-			let colorSpace = CGColorSpaceCreateDeviceRGB()
-			let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-
-			return try CGImage(
-				width: size.width,
-				height: size.height * size.layers,
-				bitsPerComponent: 8,
-				bitsPerPixel: 32,
-				bytesPerRow: size.width * 4,
-				space: colorSpace,
-				bitmapInfo: bitmapInfo,
-				provider: provider,
-				decode: nil,
-				shouldInterpolate: false,
-				intent: .defaultIntent
-			)
-			.throwing("Can't make CGImage")
-		}
+//		try? pxs.withUnsafeBytes { raw in
+//			let bytes = raw.bindMemory(to: UInt8.self)
+//			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
+//				.throwing("Can't make CFData")
+//			let provider = try CGDataProvider(data: data)
+//				.throwing("Can't make CGDataProvider")
+//			let colorSpace = CGColorSpaceCreateDeviceRGB()
+//			let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+//
+//			return try CGImage(
+//				width: size.width,
+//				height: size.height * size.layers,
+//				bitsPerComponent: 8,
+//				bitsPerPixel: 32,
+//				bytesPerRow: size.width * 4,
+//				space: colorSpace,
+//				bitmapInfo: bitmapInfo,
+//				provider: provider,
+//				decode: nil,
+//				shouldInterpolate: false,
+//				intent: .defaultIntent
+//			)
+//			.throwing("Can't make CGImage")
+//		}
+		nil
 	}
 
-	subscript(layer: Int) -> ArraySlice<Px> {
-		pxs[(size.count * layer)..<(size.count * (layer + 1))]
-	}
-
-	private var layers: [CGImage] {
-		(try? (0..<size.layers).map { layerIndex in
-			try self[layerIndex].withUnsafeBytes { raw in
-				let bytes = raw.bindMemory(to: UInt8.self)
-				let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
-					.throwing("Can't make CFData")
-				let provider = try CGDataProvider(data: data)
-					.throwing("Can't make CGDataProvider")
-				let colorSpace = CGColorSpaceCreateDeviceRGB()
-				let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-
-				return try CGImage(
-					width: size.width,
-					height: size.height,
-					bitsPerComponent: 8,
-					bitsPerPixel: 32,
-					bytesPerRow: size.width * 4,
-					space: colorSpace,
-					bitmapInfo: bitmapInfo,
-					provider: provider,
-					decode: nil,
-					shouldInterpolate: false,
-					intent: .defaultIntent
-				)
-				.throwing("Can't make CGImage")
-			}
-		}) ?? []
+	private var layerImages: [CGImage] {
+		Self.hasLayers ? layers.map(\.cgImage) : [layers[0].cgImage]
 	}
 
 	func render(in context: GraphicsContext, size: CGSize) {
-		layers.forEach { image in
+		layerImages.forEach { image in
 			context.draw(image.ui, in: CGRect(origin: .zero, size: size))
 		}
 	}

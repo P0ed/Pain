@@ -28,31 +28,31 @@ struct PxL: Hashable {
 	}
 }
 
-struct CanvasSize: Hashable {
-	private var _width: UInt16
-	private var _height: UInt16
-	private var _hasLayers: Bool
-
-	var width: Int { Int(_width) }
-	var height: Int { Int(_height) }
-	var layers: Int { _hasLayers ? 4 : 1 }
-
-	init(width: Int, height: Int, hasLayers: Bool) {
-		_width = UInt16(width)
-		_height = UInt16(height)
-		_hasLayers = hasLayers
-	}
-}
+//struct CanvasSize: Hashable {
+//	private var _width: UInt16
+//	private var _height: UInt16
+//	private var _hasLayers: Bool
+//
+//	var width: Int { Int(_width) }
+//	var height: Int { Int(_height) }
+//	var layers: Int { _hasLayers ? 4 : 1 }
+//
+//	init(width: Int, height: Int, hasLayers: Bool) {
+//		_width = UInt16(width)
+//		_height = UInt16(height)
+//		_hasLayers = hasLayers
+//	}
+//}
 
 enum Tool {
 	case pencil, eraser, bucket, replace, eyedropper
 }
 
 struct Px: Hashable, Codable {
+	var alpha: UInt8
 	var red: UInt8
 	var green: UInt8
 	var blue: UInt8
-	var alpha: UInt8
 }
 
 extension Px {
