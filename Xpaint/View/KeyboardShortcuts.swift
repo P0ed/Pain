@@ -19,14 +19,14 @@ extension EditorView {
 			}
 
 			switch chars {
-			case "1": numAction(0)
-			case "2": numAction(1)
-			case "3": numAction(2)
-			case "4": numAction(3)
-			case "5": numAction(4)
-			case "6": numAction(5)
-			case "7": numAction(6)
-			case "8": numAction(7)
+			case "1", "!": numAction(0)
+			case "2", "@": numAction(1)
+			case "3", "#": numAction(2)
+			case "4", "$": numAction(3)
+			case "5", "%": numAction(4)
+			case "6", "^": numAction(5)
+			case "7", "&": numAction(6)
+			case "8", "*": numAction(7)
 
 			case "9": setScale(1.0)
 			case "0": setScale(file.size.zoomToFit(state.size))
