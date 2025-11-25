@@ -1,21 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-protocol TypeProvider {
-	static var type: UTType { get }
-	associatedtype ExportType: TypeProvider
-}
-
-enum PXD: TypeProvider {
-	static var type: UTType { .pxd }
-	typealias ExportType = PNG
-}
-
-enum PNG: TypeProvider {
-	static var type: UTType { .png }
-	typealias ExportType = PXD
-}
-
 struct Document<ContentType: TypeProvider>: FileDocument {
 	private(set) var size: CanvasSize
 	var pxs: [Px]
@@ -24,7 +9,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 
 	init() {
 		size = CanvasSize(width: 32, height: 32, hasLayers: ContentType.type == .pxd)
-        pxs = size.alloc(color: .white)
+        pxs = size.alloc(color: .clear)
 	}
 
 	init<T: TypeProvider>(converting file: Document<T>) where T.ExportType == ContentType {
@@ -43,10 +28,10 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 
 	init(configuration: ReadConfiguration) throws {
 		let data = try configuration.file.regularFileContents
-			.unwrap("Failed to read file")
+			.throwing("Failed to read file")
 
 		let image = try (NSBitmapImageRep(data: data)?.cgImage)
-			.unwrap("Failed to open image")
+			.throwing("Failed to open image")
 
 		if ContentType.type == .png {
 			size = CanvasSize(
@@ -56,6 +41,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 			)
 		} else {
 			guard image.height & 0b11 == 0 else { throw Err("Corrupted file") }
+
 			size = CanvasSize(
 				width: image.width,
 				height: image.height >> 2,
@@ -67,12 +53,12 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 	}
 
 	func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-		let cgImage = try image
-			.unwrap("Failed to create CGImage")
+		let cgImage = try exportImage
+			.throwing("Failed to create CGImage")
 
 		let data = try NSBitmapImageRep(cgImage: cgImage)
 			.representation(using: .png, properties: [:])
-			.unwrap("Failed to create PNG representation")
+			.throwing("Failed to create PNG representation")
 
 		return FileWrapper(regularFileWithContents: data)
 	}
@@ -107,13 +93,13 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		}
 	}
 
-	private var image: CGImage? {
+	private var exportImage: CGImage? {
 		try? pxs.withUnsafeBytes { raw in
 			let bytes = raw.bindMemory(to: UInt8.self)
 			let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
-				.unwrap("Can't make CFData")
+				.throwing("Can't make CFData")
 			let provider = try CGDataProvider(data: data)
-				.unwrap("Can't make CGDataProvider")
+				.throwing("Can't make CGDataProvider")
 			let colorSpace = CGColorSpaceCreateDeviceRGB()
 			let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
 
@@ -130,19 +116,65 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 				shouldInterpolate: false,
 				intent: .defaultIntent
 			)
-			.unwrap("Can't make CGImage")
+			.throwing("Can't make CGImage")
 		}
 	}
 
+	subscript(layer: Int) -> ArraySlice<Px> {
+		pxs[(size.count * layer)..<(size.count * (layer + 1))]
+	}
+
+	private var layers: [CGImage] {
+		(try? (0..<size.layers).map { layerIndex in
+			try self[layerIndex].withUnsafeBytes { raw in
+				let bytes = raw.bindMemory(to: UInt8.self)
+				let data = try CFDataCreate(nil, bytes.baseAddress, bytes.count)
+					.throwing("Can't make CFData")
+				let provider = try CGDataProvider(data: data)
+					.throwing("Can't make CGDataProvider")
+				let colorSpace = CGColorSpaceCreateDeviceRGB()
+				let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+
+				return try CGImage(
+					width: size.width,
+					height: size.height,
+					bitsPerComponent: 8,
+					bitsPerPixel: 32,
+					bytesPerRow: size.width * 4,
+					space: colorSpace,
+					bitmapInfo: bitmapInfo,
+					provider: provider,
+					decode: nil,
+					shouldInterpolate: false,
+					intent: .defaultIntent
+				)
+				.throwing("Can't make CGImage")
+			}
+		}) ?? []
+	}
+
 	func render(in context: GraphicsContext, size: CGSize) {
-		guard let image else { return }
-		context.draw(image.ui, in: CGRect(origin: .zero, size: size))
+		layers.forEach { image in
+			context.draw(image.ui, in: CGRect(origin: .zero, size: size))
+		}
 	}
 }
 
-extension UTType {
+protocol TypeProvider {
+	static var type: UTType { get }
+	associatedtype ExportType: TypeProvider
+}
 
-	static var pxd: Self {
-		UTType("p0.xpaint.pxd")!
-	}
+enum PXD: TypeProvider {
+	static var type: UTType { .pxd }
+	typealias ExportType = PNG
+}
+
+enum PNG: TypeProvider {
+	static var type: UTType { .png }
+	typealias ExportType = PXD
+}
+
+extension UTType {
+	static var pxd: Self { UTType("p0.xpaint.pxd")! }
 }

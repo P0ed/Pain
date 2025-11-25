@@ -51,7 +51,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 			isPresented: $export.exporting,
 			document: export.document,
 			contentType: ContentType.ExportType.type
-		) { _ in }
+		) { _ in export.document = nil }
 	}
 
 	private var canvas: some View {

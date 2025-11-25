@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct PaintApp: App {
-	@UserDefault(key: "palette", default: .warm)
+	@UserDefault(default: .warm)
 	var palette: Palette
 
 	var body: some Scene {

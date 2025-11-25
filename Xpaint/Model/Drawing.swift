@@ -16,7 +16,7 @@ extension EditorView {
 				draw(at: pxl(at: gesture.location))
 			}
 			.onEnded { _ in
-				guard state.tool != .picker else { return }
+				guard state.tool != .eyedropper else { return }
 				undoManager?.beginUndoGrouping()
 				undoManager?.setActionName(state.tool.actionName)
 				undoManager?.endUndoGrouping()
@@ -32,7 +32,7 @@ private extension EditorView {
 		case .eraser: pencil(.clear, at: pxl)
 		case .bucket: bucket(at: pxl)
 		case .replace: replace(at: pxl)
-		case .picker: state.primaryColor = file[pxl]
+		case .eyedropper: state.primaryColor = file[pxl]
 		}
 	}
 

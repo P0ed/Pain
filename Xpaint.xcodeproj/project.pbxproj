@@ -55,7 +55,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5F28FCA22EABDC8100C0A181 /* Extensions */ = {
+		5F28FCA22EABDC8100C0A181 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
 				5F28FC9E2EABDC8100C0A181 /* CoreGraphics.swift */,
@@ -63,27 +63,43 @@
 				5F28FCA02EABDC8100C0A181 /* SwiftUI.swift */,
 				5F28FCA12EABDC8100C0A181 /* UserDefaults.swift */,
 			);
-			path = Extensions;
+			path = Utility;
 			sourceTree = "<group>";
 		};
 		5F28FCAE2EABDC8100C0A181 /* Xpaint */ = {
 			isa = PBXGroup;
 			children = (
-				5F28FCA22EABDC8100C0A181 /* Extensions */,
-				5F28FCA32EABDC8100C0A181 /* App.swift */,
-				5F28FCA72EABDC8100C0A181 /* Document.swift */,
-				5F5FDB072EC63A6D003B29BD /* Operations.swift */,
-				5F28FCA92EABDC8100C0A181 /* EditorView.swift */,
-				5F3FA6C02ED505C800C15785 /* SideBar.swift */,
-				5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */,
-				5F28FCA52EABDC8100C0A181 /* Colors.swift */,
-				5F28FCA62EABDC8100C0A181 /* Data.swift */,
-				5F28FCA82EABDC8100C0A181 /* Drawing.swift */,
-				5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */,
+				5FD0610E2ED63D1C00B82152 /* View */,
+				5FD0610F2ED63D2D00B82152 /* Model */,
+				5F28FCA22EABDC8100C0A181 /* Utility */,
 				5F28FCA42EABDC8100C0A181 /* Assets.xcassets */,
 				5F28FCAA2EABDC8100C0A181 /* Info.plist */,
 			);
 			path = Xpaint;
+			sourceTree = "<group>";
+		};
+		5FD0610E2ED63D1C00B82152 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				5F28FCA32EABDC8100C0A181 /* App.swift */,
+				5F28FCA92EABDC8100C0A181 /* EditorView.swift */,
+				5F3FA6C02ED505C800C15785 /* SideBar.swift */,
+				5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */,
+				5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		5FD0610F2ED63D2D00B82152 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				5F28FCA72EABDC8100C0A181 /* Document.swift */,
+				5F28FCA62EABDC8100C0A181 /* Data.swift */,
+				5F28FCA52EABDC8100C0A181 /* Colors.swift */,
+				5F28FCA82EABDC8100C0A181 /* Drawing.swift */,
+				5F5FDB072EC63A6D003B29BD /* Operations.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		5FF2A3A72E8F136C00EA7883 = {

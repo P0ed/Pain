@@ -13,7 +13,7 @@ func modifying<A>(_ value: A, _ transform: (inout A) -> Void) -> A {
 
 extension Optional {
 
-	func unwrap(_ fallback: @autoclosure () -> Error) throws -> Wrapped {
+	func throwing(_ fallback: @autoclosure () -> Error) throws -> Wrapped {
 		if let self {
 			self
 		} else {
@@ -21,8 +21,8 @@ extension Optional {
 		}
 	}
 
-	func unwrap(_ fallback: @autoclosure () -> String) throws -> Wrapped {
-		try unwrap(Err(fallback()))
+	func throwing(_ fallback: @autoclosure () -> String) throws -> Wrapped {
+		try throwing(Err(fallback()))
 	}
 }
 
@@ -74,5 +74,25 @@ extension Array {
 				self[idx]
 			}
 		}
+	}
+
+	func inline<let staticCount: Int>() throws -> InlineArray<staticCount, Element> {
+		if count == staticCount {
+			.init { i in self[i] }
+		} else {
+			throw Err("Failed to load InlineArray. `count: \(count) != \(staticCount)`")
+		}
+	}
+}
+
+extension InlineArray: @retroactive Codable where Element: Codable {
+
+	public init(from decoder: any Decoder) throws {
+		self = try decoder.singleValueContainer().decode([Element].self).inline()
+	}
+
+	public func encode(to encoder: any Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(array)
 	}
 }

@@ -7,7 +7,7 @@ extension CanvasSize {
 
 	func index(at pxl: PxL) -> Int? {
 		if pxl.x >= 0 && pxl.x < width && pxl.y >= 0 && pxl.y < height {
-			.some(pxl.x + (height - 1 - pxl.y) * width)
+			.some(pxl.x + (height - 1 - pxl.y) * width + count * pxl.z)
 		} else {
 			.none
 		}

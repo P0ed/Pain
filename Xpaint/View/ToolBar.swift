@@ -16,7 +16,7 @@ extension EditorView {
 		}
 		ToolbarItemGroup {
 			ToolButton(tool: .pencil, state: $state.tool)
-			ToolButton(tool: .picker, state: $state.tool)
+			ToolButton(tool: .eyedropper, state: $state.tool)
 			ToolButton(tool: .eraser, state: $state.tool)
 			ToolButton(tool: .bucket, state: $state.tool)
 			ToolButton(tool: .replace, state: $state.tool)
@@ -25,13 +25,26 @@ extension EditorView {
 			Spacer()
 		}
 		ToolbarItemGroup {
-			ActionButton(name: "Make monochrome", image: "sum", shortcut: "G") {
+			ActionButton(
+				name: "Make monochrome",
+				image: "sum",
+				shortcut: "G",
+				modifiers: .command
+			) {
 				file.makeMonochrome()
 			}
-			ActionButton(name: "Shift left", image: "chevron.left.2", shortcut: "<") {
+			ActionButton(
+				name: "Shift left",
+				image: "chevron.left.2",
+				shortcut: "<"
+			) {
 				file.shiftLeft()
 			}
-			ActionButton(name: "Shift right", image: "chevron.right.2", shortcut: ">") {
+			ActionButton(
+				name: "Shift right",
+				image: "chevron.right.2",
+				shortcut: ">"
+			) {
 				file.shiftRight()
 			}
 			ActionButton(
@@ -77,15 +90,15 @@ struct LayerButton: View {
 	@Binding
 	var state: Int
 
-	static let names: [String] = ["a", "b", "c", "d"]
+	static let names: [String] = ["A", "B", "C", "D"]
 
 	var name: String { Self.names[index & 0b11] }
 
 	var body: some View {
-		Button("layer \(name.uppercased())", systemImage: "\(name).square.fill", action: {
+		Button("Layer \(name)", systemImage: "\(name.lowercased()).square.fill", action: {
 			state = index
 		})
 		.foregroundStyle(state == index ? Color.accent : .primary)
-		.keyboardShortcut(.init(name.first!), modifiers: .control)
+		.keyboardShortcut(.init(name.first!), modifiers: .shift)
 	}
 }

@@ -7,7 +7,7 @@ extension Px: ExpressibleByIntegerLiteral {
 
 extension [Palette] {
 
-	static var list: Self {
+	static var builtin: Self {
 		[
 			.monochrome,
 			.vegetation,

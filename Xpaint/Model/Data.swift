@@ -45,7 +45,7 @@ struct CanvasSize: Hashable {
 }
 
 enum Tool {
-	case pencil, eraser, bucket, replace, picker
+	case pencil, eraser, bucket, replace, eyedropper
 }
 
 struct Px: Hashable, Codable {
@@ -98,20 +98,13 @@ extension EditorState {
 
 extension Tool {
 
-	var isDraggable: Bool {
-		switch self {
-		case .pencil, .eraser: true
-		default: false
-		}
-	}
-
 	var actionName: String {
 		switch self {
 		case .pencil: "Pencil"
 		case .eraser: "Erase"
 		case .bucket: "Bucket"
 		case .replace: "Replace"
-		case .picker: "Pick color"
+		case .eyedropper: "Pick color"
 		}
 	}
 
@@ -121,17 +114,17 @@ extension Tool {
 		case .eraser: "eraser"
 		case .bucket: "paint.bucket.classic"
 		case .replace: "rectangle.2.swap"
-		case .picker: "eyedropper"
+		case .eyedropper: "eyedropper"
 		}
 	}
 
 	var shortcutCharacter: Character {
 		switch self {
-		case .pencil: "p"
-		case .eraser: "e"
-		case .bucket: "b"
-		case .replace: "r"
-		case .picker: "i"
+		case .pencil: "P"
+		case .eraser: "E"
+		case .bucket: "B"
+		case .replace: "R"
+		case .eyedropper: "I"
 		}
 	}
 }

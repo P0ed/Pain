@@ -10,7 +10,7 @@ extension EditorView {
 			func numAction(_ num: Int) {
 				let idx = num + (modifiers.contains(.option) ? 8 : 0)
 				if modifiers.contains(.command) {
-					palette = [Palette].list[idx & 0x7]
+					palette = [Palette].builtin[idx & 0x7]
 				} else if modifiers.contains(.control) {
 					palette[idx] = state.primaryColor
 				} else {
