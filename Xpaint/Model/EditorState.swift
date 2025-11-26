@@ -12,3 +12,49 @@ struct EditorState: Equatable {
 	var scrollPosition: ScrollPosition = .init(point: .zero)
 	var magnification: CGFloat = 1.0
 }
+
+extension EditorState {
+
+	mutating func swapColors() {
+		swap(&primaryColor, &secondaryColor)
+	}
+
+	var colors: [Px] { [primaryColor, secondaryColor] }
+}
+
+enum Tool {
+	case pencil, eraser, bucket, replace, eyedropper
+}
+
+extension Tool {
+
+	var actionName: String {
+		switch self {
+		case .pencil: "Pencil"
+		case .eraser: "Erase"
+		case .bucket: "Bucket"
+		case .replace: "Replace"
+		case .eyedropper: "Pick color"
+		}
+	}
+
+	var systemImage: String {
+		switch self {
+		case .pencil: "pencil"
+		case .eraser: "eraser"
+		case .bucket: "paint.bucket.classic"
+		case .replace: "rectangle.2.swap"
+		case .eyedropper: "eyedropper"
+		}
+	}
+
+	var shortcutCharacter: Character {
+		switch self {
+		case .pencil: "P"
+		case .eraser: "E"
+		case .bucket: "B"
+		case .replace: "R"
+		case .eyedropper: "I"
+		}
+	}
+}

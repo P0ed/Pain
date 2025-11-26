@@ -52,10 +52,6 @@ struct CanvasSize: Hashable {
 	}
 }
 
-enum Tool {
-	case pencil, eraser, bucket, replace, eyedropper
-}
-
 struct Px: Hashable, Codable {
 	var alpha: UInt8
 	var red: UInt8
@@ -65,25 +61,25 @@ struct Px: Hashable, Codable {
 
 extension Px {
 
-	init(rgba: UInt32) {
-		red = UInt8(rgba >> 8 & 0xFF)
-		green = UInt8(rgba >> 16 & 0xFF)
-		blue = UInt8(rgba >> 24 & 0xFF)
-		alpha = UInt8(rgba >> 0 & 0xFF)
+	init(rgb: UInt32) {
+		red = UInt8(rgb >> 0 & 0xFF)
+		green = UInt8(rgb >> 8 & 0xFF)
+		blue = UInt8(rgb >> 16 & 0xFF)
+		alpha = 0xFF
 	}
 
-	var rgba: UInt32 {
-		UInt32(red) << 0
-		| UInt32(green) << 8
-		| UInt32(blue) << 16
-		| UInt32(alpha) << 24
+	init(argb: UInt32) {
+		red = UInt8(argb >> 0 & 0xFF)
+		green = UInt8(argb >> 8 & 0xFF)
+		blue = UInt8(argb >> 16 & 0xFF)
+		alpha = UInt8(argb >> 24 & 0xFF)
 	}
 }
 
 extension Px {
-	static var white: Self { 0xFFFFFFFF }
-	static var black: Self { 0x000000FF }
-	static var clear: Self { 0x00000000 }
+	static var white: Self { 0xFFFFFF }
+	static var black: Self { 0x000000 }
+	static var clear: Self { .init(argb: 0x0) }
 }
 
 struct Palette: Hashable, Codable {
@@ -92,48 +88,6 @@ struct Palette: Hashable, Codable {
 	subscript(_ idx: Int) -> Px {
 		get { colors[idx & 0xF] }
 		set { colors[idx & 0xF] = newValue }
-	}
-}
-
-extension EditorState {
-
-	mutating func swapColors() {
-		swap(&primaryColor, &secondaryColor)
-	}
-
-	var colors: [Px] { [primaryColor, secondaryColor] }
-}
-
-extension Tool {
-
-	var actionName: String {
-		switch self {
-		case .pencil: "Pencil"
-		case .eraser: "Erase"
-		case .bucket: "Bucket"
-		case .replace: "Replace"
-		case .eyedropper: "Pick color"
-		}
-	}
-
-	var systemImage: String {
-		switch self {
-		case .pencil: "pencil"
-		case .eraser: "eraser"
-		case .bucket: "paint.bucket.classic"
-		case .replace: "rectangle.2.swap"
-		case .eyedropper: "eyedropper"
-		}
-	}
-
-	var shortcutCharacter: Character {
-		switch self {
-		case .pencil: "P"
-		case .eraser: "E"
-		case .bucket: "B"
-		case .replace: "R"
-		case .eyedropper: "I"
-		}
 	}
 }
 
