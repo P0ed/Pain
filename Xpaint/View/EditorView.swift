@@ -1,26 +1,23 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
-struct EditorState: Equatable {
-	var primaryColor: Px = .black
-	var secondaryColor: Px = .white
-	var tool: Tool = .pencil
-	var dither: Bool = false
-	var size: CGSize = .zero
-	var frame: CGRect = .zero
-	var scrollPosition: ScrollPosition = .init(point: .zero)
-	var magnification: CGFloat = 1.0
-}
+struct EditorView<ContentType: TypeProvider>: View {
 
-struct EditorView: View {
+	struct ExportState {
+		var exporting: Bool = false
+		var document: Document<ContentType.ExportType>?
+	}
+
 	@State var state: EditorState = .init()
+	@State var export: ExportState = .init()
 	@Binding var palette: Palette
-	@Binding var file: Document
+	@Binding var file: Document<ContentType>
 
 	@GestureState var magnifyGestureState: CGFloat?
 	@FocusState private(set) var focused: Bool
 	@Environment(\.undoManager) var undoManager
 
-	init(palette: Binding<Palette>, file: Binding<Document>) {
+	init(palette: Binding<Palette>, file: Binding<Document<ContentType>>) {
 		_palette = palette
 		_file = file
 	}
@@ -36,13 +33,18 @@ struct EditorView: View {
 		.focusEffectDisabled()
 		.onAppear { focused = true }
 		.onKeyPress(action: keyboardController)
+		.fileExporter(
+			isPresented: $export.exporting,
+			document: export.document,
+			contentType: ContentType.ExportType.type
+		) { _ in export.document = nil }
 	}
 
 	private var canvas: some View {
 		ScrollView([.horizontal, .vertical]) {
 			GeometryReader { geo in
 				Canvas { ctx, size in
-					file.render(in: ctx, size: size)
+					file.render(mask: state.visibleLayers, in: ctx, size: size)
 				}
 				.gesture(drawingController)
 				.onChange(of: geo.frame(in: .scrollView)) { _, new in

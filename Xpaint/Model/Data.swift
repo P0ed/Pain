@@ -1,22 +1,30 @@
+/// Pixel location
 struct PxL: Hashable {
     private var _x: Int16
     private var _y: Int16
+	private var _z: Int8
 
     var x: Int { Int(_x) }
     var y: Int { Int(_y) }
+	var z: Int { Int(_z) }
 
-    init(x: Int, y: Int) {
+	init(x: Int, y: Int, z: Int) {
         _x = Int16(x)
         _y = Int16(y)
+		_z = Int8(z & 0b11)
     }
 
 	var neighbors: [4 of PxL] {
 		[
-			.init(x: x - 1, y: y),
-			.init(x: x + 1, y: y),
-			.init(x: x, y: y - 1),
-			.init(x: x, y: y + 1),
+			.init(x: x - 1, y: y, z: z),
+			.init(x: x + 1, y: y, z: z),
+			.init(x: x, y: y - 1, z: z),
+			.init(x: x, y: y + 1, z: z),
 		]
+	}
+
+	var xy: PxL {
+		PxL(x: x, y: y, z: 0)
 	}
 
 	var isEven: Bool {
@@ -24,20 +32,35 @@ struct PxL: Hashable {
 	}
 }
 
-struct PxSize: Hashable {
-	var width: Int
-	var height: Int
+struct CanvasSize: Hashable {
+	private var _width: UInt16
+	private var _height: UInt16
+	var hasLayers: Bool
+
+	var width: Int { Int(_width) }
+	var height: Int { Int(_height) }
+	var layers: Int { hasLayers ? 4 : 1 }
+
+	init(width: Int, height: Int, hasLayers: Bool) {
+		_width = UInt16(width)
+		_height = UInt16(height)
+		self.hasLayers = hasLayers
+	}
+
+	func alloc(color: Px = .clear) -> [Px] {
+		.init(repeating: color, count: count * layers)
+	}
 }
 
 enum Tool {
-	case pencil, eraser, bucket, replace, picker
+	case pencil, eraser, bucket, replace, eyedropper
 }
 
 struct Px: Hashable, Codable {
+	var alpha: UInt8
 	var red: UInt8
 	var green: UInt8
 	var blue: UInt8
-	var alpha: UInt8
 }
 
 extension Px {
@@ -81,25 +104,7 @@ extension EditorState {
 	var colors: [Px] { [primaryColor, secondaryColor] }
 }
 
-extension PxSize {
-
-	func forEach(_ fn: (PxL) -> Void) {
-		(0..<height).forEach { y in
-			(0..<width).forEach { x in
-				fn(PxL(x: x, y: y))
-			}
-		}
-	}
-}
-
 extension Tool {
-
-	var isDraggable: Bool {
-		switch self {
-		case .pencil, .eraser: true
-		default: false
-		}
-	}
 
 	var actionName: String {
 		switch self {
@@ -107,7 +112,7 @@ extension Tool {
 		case .eraser: "Erase"
 		case .bucket: "Bucket"
 		case .replace: "Replace"
-		case .picker: "Pick color"
+		case .eyedropper: "Pick color"
 		}
 	}
 
@@ -117,17 +122,17 @@ extension Tool {
 		case .eraser: "eraser"
 		case .bucket: "paint.bucket.classic"
 		case .replace: "rectangle.2.swap"
-		case .picker: "eyedropper"
+		case .eyedropper: "eyedropper"
 		}
 	}
 
 	var shortcutCharacter: Character {
 		switch self {
-		case .pencil: "p"
-		case .eraser: "e"
-		case .bucket: "b"
-		case .replace: "r"
-		case .picker: "i"
+		case .pencil: "P"
+		case .eraser: "E"
+		case .bucket: "B"
+		case .replace: "R"
+		case .eyedropper: "I"
 		}
 	}
 }
