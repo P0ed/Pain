@@ -39,17 +39,17 @@ private extension EditorView {
 	private func pencil(_ px: Px? = .none, at pxl: PxL) {
 		let px = px ?? (state.dither && pxl.isEven ? state.secondaryColor : state.primaryColor)
 		if let idx = file.size.index(at: pxl) {
-			file.layers[pxl.z].withMutablePixels { pxs in
-				pxs[idx] = px
-			}
+			file.pxs[idx] = px
 		}
 	}
 
 	private func bucket(at pxl: PxL) {
 		let size = file.size
-		guard let idx = size.index(at: pxl) else { return }
+		let layer = pxl.z
+		let pxl = pxl.xy
+		guard let idx = size.index(at: pxl.xy) else { return }
 
-		file.layers[pxl.z].withMutablePixels { pxs in
+		file.withMutableLayer(layer) { pxs in
 			let c = pxs[idx]
 			let pc = state.primaryColor
 			let sc = state.dither ? state.secondaryColor : pc
@@ -78,11 +78,11 @@ private extension EditorView {
 
 	private func replace(at pxl: PxL) {
 		guard let idx = file.size.index(at: pxl) else { return }
-		let c = file.layers[pxl.z][idx]
+		let c = file.pxs[idx]
 		let pc = state.primaryColor
 		let sc = state.dither ? state.secondaryColor : pc
 
-		file.layers[state.layer].withMutablePixels { [size = file.size] pxs in
+		file.withMutableLayer(pxl.z) { [size = file.size] pxs in
 			var span = pxs.mutableSpan
 			for idx in span.indices where span[idx] == c {
 				let rc = size.pxl(at: idx).isEven ? pc : sc

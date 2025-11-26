@@ -23,26 +23,34 @@ struct PxL: Hashable {
 		]
 	}
 
+	var xy: PxL {
+		PxL(x: x, y: y, z: 0)
+	}
+
 	var isEven: Bool {
 		(x & 1 + y & 1) & 1 == 0
 	}
 }
 
-//struct CanvasSize: Hashable {
-//	private var _width: UInt16
-//	private var _height: UInt16
-//	private var _hasLayers: Bool
-//
-//	var width: Int { Int(_width) }
-//	var height: Int { Int(_height) }
-//	var layers: Int { _hasLayers ? 4 : 1 }
-//
-//	init(width: Int, height: Int, hasLayers: Bool) {
-//		_width = UInt16(width)
-//		_height = UInt16(height)
-//		_hasLayers = hasLayers
-//	}
-//}
+struct CanvasSize: Hashable {
+	private var _width: UInt16
+	private var _height: UInt16
+	var hasLayers: Bool
+
+	var width: Int { Int(_width) }
+	var height: Int { Int(_height) }
+	var layers: Int { hasLayers ? 4 : 1 }
+
+	init(width: Int, height: Int, hasLayers: Bool) {
+		_width = UInt16(width)
+		_height = UInt16(height)
+		self.hasLayers = hasLayers
+	}
+
+	func alloc(color: Px = .clear) -> [Px] {
+		.init(repeating: color, count: count * layers)
+	}
+}
 
 enum Tool {
 	case pencil, eraser, bucket, replace, eyedropper

@@ -3,7 +3,7 @@ import SwiftUI
 extension EditorView {
 
 	func shiftLeft() {
-		file.layers[state.layer].modifyEach { px in
+		file.withMutablePixel(state.layer) { px in
 			px.red <<= 1
 			px.green <<= 1
 			px.blue <<= 1
@@ -11,7 +11,7 @@ extension EditorView {
 	}
 
 	func shiftRight() {
-		file.layers[state.layer].modifyEach { px in
+		file.withMutablePixel(state.layer) { px in
 			px.red >>= 1
 			px.green >>= 1
 			px.blue >>= 1
@@ -19,7 +19,7 @@ extension EditorView {
 	}
 
 	func makeMonochrome() {
-		file.layers[state.layer].modifyEach { px in
+		file.withMutablePixel(state.layer) { px in
 			let avg = UInt8(
 				clamping: (UInt16(px.red) + UInt16(px.green) + UInt16(px.blue)) / 3
 			)
@@ -32,5 +32,9 @@ extension EditorView {
 	func exportFile() {
 		export.document = Document(converting: file)
 		export.exporting = true
+	}
+
+	func wipeLayer() {
+		file.withMutablePixel(state.layer) { px in px = .clear }
 	}
 }

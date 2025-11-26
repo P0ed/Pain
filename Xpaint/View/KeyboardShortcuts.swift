@@ -34,6 +34,7 @@ extension EditorView {
 			case "=": setScale(state.magnification * 2.0)
 
 			case "x": state.swapColors()
+			case "w" where modifiers.contains(.control): wipeLayer()
 
 			default: return .ignored
 			}
