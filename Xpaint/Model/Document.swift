@@ -21,7 +21,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		pxs = size.alloc()
 
 		if !Self.hasLayers {
-			file.pixelBuffers.forEach(pixelBuffers[0].merge)
+			file.pixelBuffers.forEach(mutablePixelBuffers[0].merge)
 		}
 	}
 
@@ -158,8 +158,27 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		}
 	}
 
+	private var mutablePixelBuffers: [PixelBuffer<Interleaved8x4>] {
+		mutating get {
+			pxs.withUnsafeMutableBytes { ptr in
+				(0..<size.layers).map { idx in
+					PixelBuffer<Interleaved8x4>(
+						data: .init(mutating: ptr.baseAddress!.advanced(by: idx * size.count * 4)),
+						width: size.width,
+						height: size.height,
+						byteCountPerRow: size.width * 4
+					)
+				}
+			}
+		}
+	}
+
 	private func range(_ layer: Int) -> Range<Int> {
 		layer * size.count ..< (layer + 1) * size.count
+	}
+
+	mutating func withMutablePixelBuffers<A>(_ body: ([PixelBuffer<Interleaved8x4>]) -> A) -> A {
+		body(mutablePixelBuffers)
 	}
 
 	mutating func withMutableLayer<A>(_ layer: Int, body: (UnsafeMutableBufferPointer<Px>) -> A) -> A {

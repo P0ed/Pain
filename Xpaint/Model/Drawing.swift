@@ -1,4 +1,5 @@
 import SwiftUI
+import Accelerate
 
 extension EditorView {
 
@@ -44,34 +45,44 @@ private extension EditorView {
 	}
 
 	private func bucket(at pxl: PxL) {
-		let size = file.size
-		let layer = pxl.z
-		let pxl = pxl.xy
-		guard let idx = size.index(at: pxl.xy) else { return }
+		if state.dither {
+			let size = file.size
+			let layer = pxl.z
+			let pxl = pxl.xy
+			guard let idx = size.index(at: pxl.xy) else { return }
 
-		file.withMutableLayer(layer) { pxs in
-			let c = pxs[idx]
-			let pc = state.primaryColor
-			let sc = state.dither ? state.secondaryColor : pc
-			pxs[idx] = pxl.isEven ? pc : sc
+			file.withMutableLayer(layer) { pxs in
+				let c = pxs[idx]
+				let pc = state.primaryColor
+				let sc = state.secondaryColor
+				pxs[idx] = pxl.isEven ? pc : sc
 
-			var stroke = BitSet(count: size.count)
-			stroke[idx] = true
-			var front = [pxl] as [PxL]
-			while !front.isEmpty {
-				front = front.flatMap { pxl in
-					pxl.neighbors.compactMap { pxl in
-						size.index(at: pxl).flatMap { idx in
-							if !stroke[idx], pxs[idx] == c {
-								pxs[idx] = pxl.isEven ? pc : sc
-								stroke[idx] = true
-								return pxl
-							} else {
-								return .none
+				var stroke = BitSet(count: size.count)
+				stroke[idx] = true
+				var front = [pxl] as [PxL]
+				while !front.isEmpty {
+					front = front.flatMap { pxl in
+						pxl.neighbors.compactMap { pxl in
+							size.index(at: pxl).flatMap { idx in
+								if !stroke[idx], pxs[idx] == c {
+									pxs[idx] = pxl.isEven ? pc : sc
+									stroke[idx] = true
+									return pxl
+								} else {
+									return .none
+								}
 							}
 						}
 					}
 				}
+			}
+		} else {
+			file.withMutablePixelBuffers { bufs in
+				bufs[pxl.z].floodFill(
+					from: CGPoint(x: pxl.x, y: pxl.y),
+					newColor: state.primaryColor.pixel8888,
+					connectivity: .edges
+				)
 			}
 		}
 	}

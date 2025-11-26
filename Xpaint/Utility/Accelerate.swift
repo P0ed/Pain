@@ -4,6 +4,13 @@ typealias PixelBuffer<Format: PixelFormat> = vImage.PixelBuffer<Format>
 typealias Interleaved8x4 = vImage.Interleaved8x4
 typealias Size = vImage.Size
 
+extension Px {
+
+	var pixel8888: Pixel_8888 {
+		(alpha, red, green, blue)
+	}
+}
+
 extension PixelBuffer where Format: SinglePlanePixelFormat, Format: StaticPixelFormat {
 
 	func merge(_ buffer: PixelBuffer) {
