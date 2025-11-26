@@ -77,8 +77,8 @@ private extension EditorView {
 				}
 			}
 		} else {
-			file.withMutablePixelBuffers { bufs in
-				bufs[pxl.z].floodFill(
+			file.withMutablePixelBuffers { layers in
+				layers[pxl.z].floodFill(
 					from: CGPoint(x: pxl.x, y: pxl.y),
 					newColor: state.primaryColor.pixel8888,
 					connectivity: .edges

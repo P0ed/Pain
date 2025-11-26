@@ -163,7 +163,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 			pxs.withUnsafeMutableBytes { ptr in
 				(0..<size.layers).map { idx in
 					PixelBuffer<Interleaved8x4>(
-						data: .init(mutating: ptr.baseAddress!.advanced(by: idx * size.count * 4)),
+						data: ptr.baseAddress!.advanced(by: idx * size.count * 4),
 						width: size.width,
 						height: size.height,
 						byteCountPerRow: size.width * 4
