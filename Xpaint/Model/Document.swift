@@ -196,9 +196,11 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		}
 	}
 
-	func render(in context: GraphicsContext, size: CGSize) {
-		layers.forEach { image in
-			context.draw(image.ui, in: CGRect(origin: .zero, size: size))
+	func render(mask: Int, in context: GraphicsContext, size: CGSize) {
+		layers.enumerated().forEach { index, image in
+			if mask & 1 << index != 0 {
+				context.draw(image.ui, in: CGRect(origin: .zero, size: size))
+			}
 		}
 	}
 }

@@ -44,7 +44,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 		ScrollView([.horizontal, .vertical]) {
 			GeometryReader { geo in
 				Canvas { ctx, size in
-					file.render(in: ctx, size: size)
+					file.render(mask: state.visibleLayers, in: ctx, size: size)
 				}
 				.gesture(drawingController)
 				.onChange(of: geo.frame(in: .scrollView)) { _, new in
