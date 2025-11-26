@@ -7,11 +7,7 @@ extension EditorView {
 		if ContentType.type == .pxd {
 			ToolbarItemGroup {
 				ForEach(0..<4) { idx in
-					LayerButton(
-						isVisible: state.visibleLayers & 1 << idx != 0,
-						index: idx,
-						state: $state.layer
-					)
+					LayerButton(index: idx, state: $state)
 				}
 			}
 			ToolbarItemGroup {
@@ -85,22 +81,28 @@ struct ActionButton: View {
 }
 
 struct LayerButton: View {
-	var isVisible: Bool
 	var index: Int
 	@Binding
-	var state: Int
+	var state: EditorState
 
 	static let names: [String] = ["A", "B", "C", "D"]
 
 	var name: String { Self.names[index & 0b11] }
+	var isVisible: Bool { state.visibleLayers & 1 << index != 0 }
 
 	var body: some View {
 		Button(
 			"Layer \(name)",
 			systemImage: "\(name.lowercased()).square\(isVisible ? ".fill" : "")",
-			action: { state = index }
+			action: {
+				if state.layer == index {
+					state.visibleLayers = state.visibleLayers ^ 1 << index
+				} else {
+					state.layer = index
+				}
+			}
 		)
-		.foregroundStyle(state == index ? Color.accent : .primary)
+		.foregroundStyle(state.layer == index ? Color.accent : .primary)
 		.keyboardShortcut(.init(name.first!), modifiers: .shift)
 	}
 }
