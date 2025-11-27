@@ -138,7 +138,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		}
 	}
 
-	private func range(_ layer: Int?) -> Range<Int> {
+	func range(_ layer: Int?) -> Range<Int> {
 		layer.map { layer in
 			layer * size.count ..< (layer + 1) * size.count
 		}

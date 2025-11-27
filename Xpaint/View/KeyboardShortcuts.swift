@@ -28,19 +28,14 @@ extension EditorView {
 			case "7", "&": numAction(6)
 			case "8", "*": numAction(7)
 
-			case "A" where modifiers == [.shift, .command]:
-				state.visibleLayers = state.visibleLayers ^ 1 << 0
-			case "B" where modifiers == [.shift, .command]:
-				state.visibleLayers = state.visibleLayers ^ 1 << 1
-			case "C" where modifiers == [.shift, .command]:
-				state.visibleLayers = state.visibleLayers ^ 1 << 2
-			case "D" where modifiers == [.shift, .command]:
-				state.visibleLayers = state.visibleLayers ^ 1 << 3
-
 			case "9": setScale(1.0)
 			case "0": setScale(file.size.zoomToFit(state.size))
 			case "-": setScale(state.magnification / 2.0)
 			case "=": setScale(state.magnification * 2.0)
+
+			case "x" where modifiers == .command: cut()
+			case "c" where modifiers == .command: copy()
+			case "v" where modifiers == .command: paste()
 
 			case "x": state.swapColors()
 			case "w" where modifiers == .control: wipeLayer()

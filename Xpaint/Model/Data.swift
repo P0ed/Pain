@@ -40,8 +40,10 @@ struct CanvasSize: Hashable {
 	var width: Int { Int(_width) }
 	var height: Int { Int(_height) }
 	var layers: Int { hasLayers ? 4 : 1 }
-	var filmWidth: Int { width }
-	var filmHeight: Int { height * layers }
+
+	static var max: CanvasSize {
+		CanvasSize(width: 4096, height: 4096, hasLayers: false)
+	}
 
 	init(width: Int, height: Int, hasLayers: Bool) {
 		_width = UInt16(width)
@@ -51,6 +53,20 @@ struct CanvasSize: Hashable {
 
 	func alloc(color: Px = .clear) -> [Px] {
 		.init(repeating: color, count: count * layers)
+	}
+}
+
+struct PxBuffer {
+	var width: Int
+	var height: Int
+	var pxs: [Px]
+
+	static var rx: PxBuffer {
+		PxBuffer(
+			width: 0,
+			height: 0,
+			pxs: CanvasSize.max.alloc()
+		)
 	}
 }
 

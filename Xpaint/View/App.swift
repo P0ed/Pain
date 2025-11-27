@@ -4,20 +4,23 @@ import SwiftUI
 struct PaintApp: App {
 	@UserDefault(default: .warm)
 	var palette: Palette
+	@Heap
+	var rx: PxBuffer = .rx
 
 	var body: some Scene {
-		DocumentGroup(
-			newDocument: Document<PXD>(),
-			editor: { cfg in
-				EditorView(palette: $palette, file: cfg.$document)
-			}
-		)
-		.windowToolbarStyle(.unified)
+		documentGroup(PXD.self)
+		documentGroup(PNG.self)
+	}
 
+	func documentGroup<T: TypeProvider>(_ type: T.Type) -> some Scene {
 		DocumentGroup(
-			newDocument: Document<PNG>(),
+			newDocument: Document<T>(),
 			editor: { cfg in
-				EditorView(palette: $palette, file: cfg.$document)
+				EditorView(
+					palette: $palette,
+					file: cfg.$document,
+					rx: $rx
+				)
 			}
 		)
 		.windowToolbarStyle(.unified)

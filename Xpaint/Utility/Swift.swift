@@ -109,4 +109,8 @@ final class Heap<A> {
 		get { storage }
 		set { storage = newValue }
 	}
+
+	var projectedValue: Heap<A> {
+		self
+	}
 }

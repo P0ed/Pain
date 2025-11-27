@@ -12,15 +12,17 @@ struct EditorView<ContentType: TypeProvider>: View {
 	@State var export: ExportState = .init()
 	@Binding var palette: Palette
 	@Binding var file: Document<ContentType>
+	@Heap var rx: PxBuffer
 
 	@State var sizeDialogPresented: Bool = false
 	@GestureState var magnifyGestureState: CGFloat?
 	@FocusState private(set) var focused: Bool
 	@Environment(\.undoManager) var undoManager
 
-	init(palette: Binding<Palette>, file: Binding<Document<ContentType>>) {
+	init(palette: Binding<Palette>, file: Binding<Document<ContentType>>, rx: Heap<PxBuffer>) {
 		_palette = palette
 		_file = file
+		_rx = rx
 	}
 
 	var body: some View {

@@ -66,4 +66,31 @@ extension EditorView {
 			}
 		}
 	}
+
+	func cut() {
+		copy()
+		file.withMutablePixel(state.layer) { px in px = .clear }
+	}
+
+	func copy() {
+		let layer = file.pxs[file.range(state.layer)]
+		rx.pxs.replaceSubrange(0 ..< layer.count - 1, with: layer)
+		rx.width = file.size.width
+		rx.height = file.size.height
+	}
+
+	func paste() {
+		file.withMutableLayer(state.layer) { [
+			size = file.size,
+			rxw = rx.width,
+			rxh = rx.height,
+			src = rx.pxs
+		] dst in
+			for y in 0 ..< min(size.height, rxh) {
+				for x in 0 ..< min(size.width, rxw) {
+					dst[y * size.width + x] = src[y * rxw + x]
+				}
+			}
+		}
+	}
 }

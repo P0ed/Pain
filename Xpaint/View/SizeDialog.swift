@@ -9,7 +9,7 @@ struct SizeDialog: View {
 
 	private var isValidSize: Bool {
 		guard let w, let h else { return false }
-		return w > 0 && h > 0 && w * h <= 1 << 24
+		return w > 0 && h > 0 && w * h <= CanvasSize.max.count
 	}
 
 	var onConfirm: (Int, Int) -> Void
