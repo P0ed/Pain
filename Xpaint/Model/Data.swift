@@ -40,6 +40,8 @@ struct CanvasSize: Hashable {
 	var width: Int { Int(_width) }
 	var height: Int { Int(_height) }
 	var layers: Int { hasLayers ? 4 : 1 }
+	var filmWidth: Int { width }
+	var filmHeight: Int { height * layers }
 
 	init(width: Int, height: Int, hasLayers: Bool) {
 		_width = UInt16(width)

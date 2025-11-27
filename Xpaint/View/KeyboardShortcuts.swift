@@ -44,6 +44,12 @@ extension EditorView {
 
 			case "x": state.swapColors()
 			case "w" where modifiers == .control: wipeLayer()
+			case "r" where modifiers == .control: sizeDialogPresented = true
+
+			case "h": move(dx: -1)
+			case "j": move(dy: -1)
+			case "k": move(dy: 1)
+			case "l": move(dx: 1)
 
 			default: return .ignored
 			}

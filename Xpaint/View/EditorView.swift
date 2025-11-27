@@ -13,6 +13,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 	@Binding var palette: Palette
 	@Binding var file: Document<ContentType>
 
+	@State var sizeDialogPresented: Bool = false
 	@GestureState var magnifyGestureState: CGFloat?
 	@FocusState private(set) var focused: Bool
 	@Environment(\.undoManager) var undoManager
@@ -37,7 +38,12 @@ struct EditorView<ContentType: TypeProvider>: View {
 			isPresented: $export.exporting,
 			document: export.document,
 			contentType: ContentType.ExportType.type
-		) { _ in export.document = nil }
+		) { _ in
+			export.document = nil
+		}
+		.sheet(isPresented: $sizeDialogPresented) {
+			SizeDialog { w, h in file.resize(width: w, height: h) }
+		}
 	}
 
 	private var canvas: some View {
