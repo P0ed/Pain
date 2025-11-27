@@ -41,14 +41,17 @@ extension EditorView {
 			case "w" where modifiers == .control: wipeLayer()
 			case "r" where modifiers == .control: sizeDialogPresented = true
 
-			case "h": move(dx: -1)
-			case "j": move(dy: -1)
-			case "k": move(dy: 1)
-			case "l": move(dx: 1)
-
-			default: return .ignored
+			default:
+				switch keys.key.character {
+				case "\t": state.layer = (state.layer + 1) & 0b11
+				case "\u{19}": state.layer = (state.layer - 1) & 0b11
+				case KeyEquivalent.leftArrow.character: move(dx: -1)
+				case KeyEquivalent.downArrow.character: move(dy: 1)
+				case KeyEquivalent.upArrow.character: move(dy: -1)
+				case KeyEquivalent.rightArrow.character: move(dx: 1)
+				default: return .ignored
+				}
 			}
-
 			return .handled
 		}
 	}
