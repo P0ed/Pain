@@ -20,11 +20,9 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		size.hasLayers = Self.hasLayers
 		pxs = size.alloc()
 
-		if !Self.hasLayers {
-			file.withPixelBuffers { src in
-				withMutablePixelBuffers { dst in
-					src.forEach(dst[0].merge)
-				}
+		file.withPixelBuffers { src in
+			withMutablePixelBuffers { dst in
+				src.forEach(dst[0].merge)
 			}
 		}
 	}
@@ -44,6 +42,9 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 			height: film.height / (Self.hasLayers ? 4 : 1),
 			hasLayers: Self.hasLayers
 		)
+		if size.count > CanvasSize.max.count {
+			throw Err("File too large")
+		}
 		pxs = size.alloc()
 		drawFilm(film)
 	}
