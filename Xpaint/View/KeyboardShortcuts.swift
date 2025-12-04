@@ -2,6 +2,10 @@ import SwiftUI
 
 extension EditorView {
 
+	private var dispatch: (@escaping () -> Void) -> Void {
+		{ f in DispatchQueue.main.async(execute: f) }
+	}
+
 	var keyboardController: (KeyPress) -> KeyPress.Result {
 		{ keys in
 			let modifiers = keys.modifiers
@@ -33,22 +37,22 @@ extension EditorView {
 			case "-": setScale(state.magnification / 2.0)
 			case "=": setScale(state.magnification * 2.0)
 
-			case "x" where modifiers == .command: cut()
-			case "c" where modifiers == .command: copy()
-			case "v" where modifiers == .command: paste()
+			case "x" where modifiers == .command: dispatch { cut() }
+			case "c" where modifiers == .command: dispatch { copy() }
+			case "v" where modifiers == .command: dispatch { paste() }
 
 			case "x": state.swapColors()
-			case "w" where modifiers == .control: wipeLayer()
+			case "w" where modifiers == .control: dispatch { wipeLayer() }
 			case "r" where modifiers == .control: sizeDialogPresented = true
 
 			default:
 				switch keys.key.character {
-				case "\t": state.layer = (state.layer + 1) & 0b11
+				case "\u{9}": state.layer = (state.layer + 1) & 0b11
 				case "\u{19}": state.layer = (state.layer - 1) & 0b11
-				case KeyEquivalent.leftArrow.character: move(dx: -1)
-				case KeyEquivalent.downArrow.character: move(dy: 1)
-				case KeyEquivalent.upArrow.character: move(dy: -1)
-				case KeyEquivalent.rightArrow.character: move(dx: 1)
+				case KeyEquivalent.leftArrow.character: dispatch { move(dx: -1) }
+				case KeyEquivalent.downArrow.character: dispatch { move(dy: 1) }
+				case KeyEquivalent.upArrow.character: dispatch { move(dy: -1) }
+				case KeyEquivalent.rightArrow.character: dispatch { move(dx: 1) }
 				default: return .ignored
 				}
 			}
