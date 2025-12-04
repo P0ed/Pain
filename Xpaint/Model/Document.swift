@@ -9,10 +9,12 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 	static var readableContentTypes: [UTType] { [ContentType.type] }
 	static var hasLayers: Bool { ContentType.type == .pxd }
 
-	init(width: Int = 32, height: Int = 32) {
+	init(width: Int = 32, height: Int = 32, color: Px? = .white) {
 		size = CanvasSize(width: width, height: height, hasLayers: Self.hasLayers)
 		pxs = size.alloc()
-		withMutablePixel(0) { px in px = .white }
+		if let color {
+			withMutablePixel(0) { px in px = color }
+		}
 	}
 
 	init<T: TypeProvider>(converting file: Document<T>) where T.ExportType == ContentType {
@@ -72,7 +74,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 	mutating func resize(width: Int, height: Int) {
 		guard let film = image() else { return }
 
-		var new = Document(width: width, height: height)
+		var new = Document(width: width, height: height, color: .none)
 		new.drawFilm(film)
 
 		self = new

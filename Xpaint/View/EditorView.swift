@@ -44,7 +44,9 @@ struct EditorView<ContentType: TypeProvider>: View {
 			export.document = nil
 		}
 		.sheet(isPresented: $sizeDialogPresented) {
-			SizeDialog { w, h in file.resize(width: w, height: h) }
+			SizeDialog(initalWidth: file.size.width, initalHeight: file.size.height) { w, h in
+				file.resize(width: w, height: h)
+			}
 		}
 	}
 
