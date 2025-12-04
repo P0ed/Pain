@@ -12,7 +12,7 @@ extension EditorView {
 			let chars = keys.characters
 
 			func numAction(_ num: Int) {
-				let idx = num + (modifiers.contains(.option) ? 8 : 0)
+				let idx = num + (modifiers.contains(.shift) ? 8 : 0)
 				if modifiers.contains(.command) {
 					palette = [Palette].builtin[idx & 0x7]
 				} else if modifiers.contains(.control) {
