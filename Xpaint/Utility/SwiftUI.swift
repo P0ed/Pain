@@ -19,3 +19,11 @@ extension CGImage {
 		Image(decorative: self, scale: 1.0).interpolation(.none)
 	}
 }
+
+extension Binding {
+
+	init(copy value: Value) {
+		var copy = value
+		self = .init(get: { copy }, set: { newValue in copy = newValue })
+	}
+}

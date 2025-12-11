@@ -40,32 +40,7 @@ extension FocusedState {
 	}
 
 	func move(dx: Int = 0, dy: Int = 0) {
-		film.withMutableLayer(state.layer) { [size = film.size] pxs in
-			let xs = dx > 0
-			? stride(from: size.width - 1, through: 0, by: -1)
-			: stride(from: 0, through: size.width - 1, by: 1)
-
-			let ys = dy > 0
-			? stride(from: size.height - 1, through: 0, by: -1)
-			: stride(from: 0, through: size.height - 1, by: 1)
-
-			for row in ys {
-				for col in xs {
-					let x = col + dx
-					let y = row + dy
-
-					let src = row * size.width + col
-					let dst = y * size.width + x
-
-					if (0..<size.width).contains(x) && (0..<size.height).contains(y) {
-						pxs[dst] = pxs[src]
-					}
-					if x != col || y != row {
-						pxs[src] = .clear
-					}
-				}
-			}
-		}
+		film.move(layer: state.layer, dx: dx, dy: dy)
 	}
 
 	func cut() {
@@ -87,7 +62,7 @@ extension FocusedState {
 		] dst in
 			for y in 0 ..< min(size.height, gs.height) {
 				for x in 0 ..< min(size.width, gs.width) {
-					dst[y * size.width + x] = src[y * gs.width + x]
+					dst[y * size.width + x] = dst[y * size.width + x] + src[y * gs.width + x]
 				}
 			}
 		}

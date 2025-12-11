@@ -4,8 +4,8 @@ import SwiftUI
 struct PaintApp: App {
 	@UserDefault(default: .warm)
 	var palette: Palette
-	@Heap
-	var global: Film = .global
+	@Binding(copy: Film.global)
+	var global: Film
 
 	var body: some Scene {
 		documentGroup(PXD.self)

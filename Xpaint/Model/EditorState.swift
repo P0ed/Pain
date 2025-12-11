@@ -18,6 +18,28 @@ struct EditorState: Equatable {
 
 extension EditorState {
 
+	mutating func setScale(_ scale: CGFloat) {
+		let scale = min(max(scale, 0.25), 64.0)
+		let frame = frame
+		let size = size
+		let dm = scale / magnification
+		let ds = CGVector(
+			dx: frame.width - size.width,
+			dy: frame.height - size.height
+		)
+		let progress = CGVector(
+			dx: ds.dx > 0.0 ? (size.width * 0.5 - frame.minX) / frame.width : 0.5,
+			dy: ds.dy > 0.0 ? (size.height * 0.5 - frame.minY) / frame.height : 0.5,
+		)
+		let offset = CGPoint(
+			x: (frame.width * dm * progress.dx - size.width * 0.5),
+			y: (frame.height * dm * progress.dy - size.height * 0.5)
+		)
+
+		magnification = scale
+		scrollPosition = .init(point: offset)
+	}
+
 	mutating func swapColors() {
 		swap(&primaryColor, &secondaryColor)
 	}
@@ -66,5 +88,18 @@ extension Tool {
 		case .replace: "R"
 		case .eyedropper: "I"
 		}
+	}
+}
+
+struct FocusedState {
+	@Binding var film: Film
+	@Binding var state: EditorState
+	@Binding var global: Film
+}
+
+extension FocusedState {
+
+	func scaleToFit() {
+		state.setScale(film.size.zoomToFit(state.size))
 	}
 }

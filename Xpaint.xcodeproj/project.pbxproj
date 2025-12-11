@@ -92,8 +92,8 @@
 			isa = PBXGroup;
 			children = (
 				5F28FCA32EABDC8100C0A181 /* App.swift */,
-				5F1B9FC32EEB54C3000B1BFC /* MenuCommands.swift */,
 				5F28FCA92EABDC8100C0A181 /* EditorView.swift */,
+				5F1B9FC32EEB54C3000B1BFC /* MenuCommands.swift */,
 				5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */,
 				5F3FA6C02ED505C800C15785 /* SideBar.swift */,
 				5FCF466A2ED8853700FE5C73 /* SizeDialog.swift */,

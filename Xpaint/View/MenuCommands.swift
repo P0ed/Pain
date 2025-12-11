@@ -1,17 +1,5 @@
 import SwiftUI
 
-struct FocusedState {
-	@Binding var film: Film
-	@Binding var state: EditorState
-	@Heap var global: Film
-
-	init(film: Binding<Film>, state: Binding<EditorState>, global: Heap<Film>) {
-		_film = film
-		_state = state
-		_global = global
-	}
-}
-
 extension FocusedValues {
 	@Entry var state: FocusedState?
 }
@@ -20,6 +8,37 @@ struct MenuCommands: Commands {
 	@FocusedValue(\.state) var state
 
 	var body: some Commands {
+		CommandGroup(before: .windowSize) {
+			ActionButton(
+				name: "Size to fit",
+				image: "square.resize",
+				shortcut: "9",
+				disabled: state == nil,
+				action: { state?.scaleToFit() }
+			)
+			ActionButton(
+				name: "Actual size",
+				image: "square.resize",
+				shortcut: "0",
+				disabled: state == nil,
+				action: { state?.state.setScale(1.0) }
+			)
+			ActionButton(
+				name: "Actual size",
+				image: "square.resize",
+				shortcut: "+",
+				disabled: state == nil,
+				action: { state?.state.setScale((state?.state.magnification ?? 1.0) * 2.0) }
+			)
+			ActionButton(
+				name: "Actual size",
+				image: "square.resize",
+				shortcut: "-",
+				disabled: state == nil,
+				action: { state?.state.setScale((state?.state.magnification ?? 1.0) / 2.0) }
+			)
+			Divider()
+		}
 		CommandMenu("Operations") {
 			ActionButton(
 				name: "Resize",

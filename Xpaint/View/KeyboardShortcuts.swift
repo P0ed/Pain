@@ -32,11 +32,6 @@ extension EditorView {
 			case "7", "&": numAction(6)
 			case "8", "*": numAction(7)
 
-			case "9": setScale(film.size.zoomToFit(state.size))
-			case "0": setScale(1.0)
-			case "-": setScale(state.magnification / 2.0)
-			case "=": setScale(state.magnification * 2.0)
-
 			case "x" where modifiers == .command: dispatch { focusedState.cut() }
 			case "c" where modifiers == .command: dispatch { focusedState.copy() }
 			case "v" where modifiers == .command: dispatch { focusedState.paste() }
