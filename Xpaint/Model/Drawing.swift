@@ -45,8 +45,8 @@ private extension EditorView {
 
 	private func bucket(at pxl: PxL) {
 		let size = film.size
-		let pxl = pxl.xy
 		let layer = pxl.z
+		let pxl = pxl.xy
 
 		guard let idx = size.index(at: pxl.xy) else { return }
 
