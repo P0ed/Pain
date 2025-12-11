@@ -97,17 +97,29 @@ extension InlineArray: @retroactive Codable where Element: Codable {
 	}
 }
 
+final class HeapRef<A> {
+	var value: A
+
+	init(value: A) {
+		self.value = value
+	}
+}
+
 @propertyWrapper
 final class Heap<A> {
-	private var storage: A
+	private var ref: HeapRef<A>
 
 	init(wrappedValue: A) {
-		storage = wrappedValue
+		ref = HeapRef(value: wrappedValue)
+	}
+
+	init(projectedValue: Heap<A>) {
+		ref = projectedValue.ref
 	}
 
 	var wrappedValue: A {
-		get { storage }
-		set { storage = newValue }
+		get { ref.value }
+		set { ref.value = newValue }
 	}
 
 	var projectedValue: Heap<A> {

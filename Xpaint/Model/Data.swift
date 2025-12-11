@@ -32,40 +32,26 @@ struct PxL: Hashable {
 	}
 }
 
-struct CanvasSize: Hashable {
-	private var _width: UInt16
-	private var _height: UInt16
-	var hasLayers: Bool
+struct FilmSize: Hashable {
+	var width: Int
+	var height: Int
+	var frames: Int
 
-	var width: Int { Int(_width) }
-	var height: Int { Int(_height) }
-	var layers: Int { hasLayers ? 4 : 1 }
-
-	static var max: CanvasSize {
-		CanvasSize(width: 4096, height: 4096, hasLayers: false)
-	}
-
-	init(width: Int, height: Int, hasLayers: Bool) {
-		_width = UInt16(width)
-		_height = UInt16(height)
-		self.hasLayers = hasLayers
+	static var max: FilmSize {
+		FilmSize(width: 4096, height: 4096, frames: 1)
 	}
 
 	func alloc(color: Px = .clear) -> [Px] {
-		.init(repeating: color, count: count * layers)
+		.init(repeating: color, count: count * frames)
 	}
 }
 
-struct PxBuffer {
-	var width: Int
-	var height: Int
-	var pxs: [Px]
+extension Film {
 
-	static var rx: PxBuffer {
-		PxBuffer(
-			width: 0,
-			height: 0,
-			pxs: CanvasSize.max.alloc()
+	static var global: Film {
+		Film(
+			size: .init(width: 0, height: 0, frames: 1),
+			pxs: FilmSize.max.alloc()
 		)
 	}
 }
@@ -91,6 +77,28 @@ extension Px {
 		green = UInt8(argb >> 8 & 0xFF)
 		blue = UInt8(argb >> 16 & 0xFF)
 		alpha = UInt8(argb >> 24 & 0xFF)
+	}
+
+	var alphaf: Float { Float(alpha) / 255.0 }
+	var redf: Float { Float(red) / 255.0 }
+	var greenf: Float { Float(green) / 255.0 }
+	var bluef: Float { Float(blue) / 255.0 }
+
+	static func + (lhs: Px, rhs: Px) -> Px {
+		Px(
+			alpha: UInt8(clamping: Int(
+				(rhs.alphaf + (1.0 - rhs.alphaf) * lhs.alphaf) * 255.0
+			)),
+			red: UInt8(clamping: Int(
+				(rhs.redf + (1.0 - rhs.alphaf) * lhs.redf) * 255.0
+			)),
+			green: UInt8(clamping: Int(
+				(rhs.greenf + (1.0 - rhs.alphaf) * lhs.greenf) * 255.0
+			)),
+			blue: UInt8(clamping: Int(
+				(rhs.bluef + (1.0 - rhs.alphaf) * lhs.bluef) * 255.0
+			))
+		)
 	}
 }
 

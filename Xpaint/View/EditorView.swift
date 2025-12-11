@@ -2,27 +2,19 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct EditorView<ContentType: TypeProvider>: View {
-
-	struct ExportState {
-		var exporting: Bool = false
-		var document: Document<ContentType.ExportType>?
-	}
-
 	@State var state: EditorState = .init()
-	@State var export: ExportState = .init()
 	@Binding var palette: Palette
-	@Binding var file: Document<ContentType>
-	@Heap var rx: PxBuffer
+	@Binding var film: Film
+	@Heap var global: Film
 
-	@State var sizeDialogPresented: Bool = false
 	@GestureState var magnifyGestureState: CGFloat?
 	@FocusState private(set) var focused: Bool
 	@Environment(\.undoManager) var undoManager
 
-	init(palette: Binding<Palette>, file: Binding<Document<ContentType>>, rx: Heap<PxBuffer>) {
+	init(palette: Binding<Palette>, film: Binding<Film>, global: Heap<Film>) {
 		_palette = palette
-		_file = file
-		_rx = rx
+		_film = film
+		_global = global
 	}
 
 	var body: some View {
@@ -34,27 +26,38 @@ struct EditorView<ContentType: TypeProvider>: View {
 		.focusable()
 		.focused($focused)
 		.focusEffectDisabled()
+		.focusedSceneValue(\.state, focusedState)
 		.onAppear { focused = true }
 		.onKeyPress(action: keyboardController)
 		.fileExporter(
-			isPresented: $export.exporting,
-			document: export.document,
+			isPresented: $state.exporting,
+			document: state.exportedFilm.map(Document<ContentType.ExportType>.init(film:)),
 			contentType: ContentType.ExportType.type
 		) { _ in
-			export.document = nil
+			state.exportedFilm = nil
 		}
-		.sheet(isPresented: $sizeDialogPresented) {
-			SizeDialog(initalWidth: file.size.width, initalHeight: file.size.height) { w, h in
-				file.resize(width: w, height: h)
-			}
+		.sheet(isPresented: $state.sizeDialogPresented) { sizeDialog }
+	}
+
+	var sizeDialog: some View {
+		SizeDialog(size: film.size) { w, h in
+			film.resize(width: w, height: h)
 		}
+	}
+
+	var focusedState: FocusedState {
+		FocusedState(
+			film: $film,
+			state: $state,
+			global: $global
+		)
 	}
 
 	private var canvas: some View {
 		ScrollView([.horizontal, .vertical]) {
 			GeometryReader { geo in
 				Canvas { ctx, size in
-					file.render(mask: state.visibleLayers, in: ctx, size: size)
+					film.render(mask: state.visibleLayers, in: ctx, size: size)
 				}
 				.gesture(drawingController)
 				.onChange(of: geo.frame(in: .scrollView)) { _, new in
@@ -62,8 +65,8 @@ struct EditorView<ContentType: TypeProvider>: View {
 				}
 			}
 			.frame(
-				width: file.size.cg.width * state.magnification,
-				height: file.size.cg.height * state.magnification
+				width: film.size.cg.width * state.magnification,
+				height: film.size.cg.height * state.magnification
 			)
 		}
 		.scrollPosition($state.scrollPosition)
@@ -80,7 +83,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 					let old = state.size
 					state.size = new
 					if old == .zero {
-						setScale(file.size.zoomToFit(state.size))
+						setScale(film.size.zoomToFit(state.size))
 					}
 				}
 		}

@@ -11,6 +11,9 @@ struct EditorState: Equatable {
 	var frame: CGRect = .zero
 	var scrollPosition: ScrollPosition = .init(point: .zero)
 	var magnification: CGFloat = 1.0
+	var sizeDialogPresented: Bool = false
+	var exporting: Bool = false
+	var exportedFilm: Film?
 }
 
 extension EditorState {
@@ -20,6 +23,13 @@ extension EditorState {
 	}
 
 	var colors: [Px] { [primaryColor, secondaryColor] }
+
+	mutating func toggleLayer() {
+		let isVisible = (visibleLayers & (1 << layer)) != 0
+		visibleLayers = isVisible
+		? visibleLayers & ~(1 << layer)
+		: visibleLayers | (1 << layer)
+	}
 }
 
 enum Tool {

@@ -1,9 +1,9 @@
 import SwiftUI
 
-extension EditorView {
+extension FocusedState {
 
 	func shiftLeft() {
-		file.withMutablePixel(state.layer) { px in
+		film.withMutablePixel(state.layer) { px in
 			px.red <<= 1
 			px.green <<= 1
 			px.blue <<= 1
@@ -11,7 +11,7 @@ extension EditorView {
 	}
 
 	func shiftRight() {
-		file.withMutablePixel(state.layer) { px in
+		film.withMutablePixel(state.layer) { px in
 			px.red >>= 1
 			px.green >>= 1
 			px.blue >>= 1
@@ -19,7 +19,7 @@ extension EditorView {
 	}
 
 	func makeMonochrome() {
-		file.withMutablePixel(state.layer) { px in
+		film.withMutablePixel(state.layer) { px in
 			let avg = UInt8(
 				clamping: (UInt16(px.red) + UInt16(px.green) + UInt16(px.blue)) / 3
 			)
@@ -29,17 +29,18 @@ extension EditorView {
 		}
 	}
 
-	func exportFile() {
-		export.document = Document(converting: file)
-		export.exporting = true
+	func exportFile<ContentType: TypeProvider>(_ type: ContentType.Type) {
+		let document = Document<ContentType>(film: film)
+		state.exportedFilm = Document(converting: document).film
+		state.exporting = true
 	}
 
 	func wipeLayer() {
-		file.withMutablePixel(state.layer) { px in px = .clear }
+		film.withMutablePixel(state.layer) { px in px = .clear }
 	}
 
 	func move(dx: Int = 0, dy: Int = 0) {
-		file.withMutableLayer(state.layer) { [size = file.size] pxs in
+		film.withMutableLayer(state.layer) { [size = film.size] pxs in
 			let xs = dx > 0
 			? stride(from: size.width - 1, through: 0, by: -1)
 			: stride(from: 0, through: size.width - 1, by: 1)
@@ -69,26 +70,24 @@ extension EditorView {
 
 	func cut() {
 		copy()
-		file.withMutablePixel(state.layer) { px in px = .clear }
+		film.withMutablePixel(state.layer) { px in px = .clear }
 	}
 
 	func copy() {
-		let layer = file.pxs[file.range(state.layer)]
-		rx.pxs.replaceSubrange(0 ..< layer.count - 1, with: layer)
-		rx.width = file.size.width
-		rx.height = file.size.height
+		let layer = film.pxs[film.range(state.layer)]
+		global.pxs.replaceSubrange(0 ..< layer.count - 1, with: layer)
+		global.size = film.size
 	}
 
 	func paste() {
-		file.withMutableLayer(state.layer) { [
-			size = file.size,
-			rxw = rx.width,
-			rxh = rx.height,
-			src = rx.pxs
+		film.withMutableLayer(state.layer) { [
+			size = film.size,
+			gs = global.size,
+			src = global.pxs
 		] dst in
-			for y in 0 ..< min(size.height, rxh) {
-				for x in 0 ..< min(size.width, rxw) {
-					dst[y * size.width + x] = src[y * rxw + x]
+			for y in 0 ..< min(size.height, gs.height) {
+				for x in 0 ..< min(size.width, gs.width) {
+					dst[y * size.width + x] = src[y * gs.width + x]
 				}
 			}
 		}

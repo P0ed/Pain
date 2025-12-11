@@ -7,7 +7,7 @@ extension CGSize {
 	}
 }
 
-extension CanvasSize {
+extension FilmSize {
 	var cg: CGSize { CGSize(width: width, height: height) }
 	var center: CGPoint { CGPoint(x: width / 2, y: height / 2) }
 	var count: Int { width * height }
@@ -23,7 +23,7 @@ extension CanvasSize {
 	func pxl(at index: Int) -> PxL {
 		PxL(
 			x: index % count % width,
-			y: index % count / width,
+			y: height - 1 - index % count / width,
 			z: index / count
 		)
 	}

@@ -32,27 +32,24 @@ extension EditorView {
 			case "7", "&": numAction(6)
 			case "8", "*": numAction(7)
 
-			case "9": setScale(file.size.zoomToFit(state.size))
+			case "9": setScale(film.size.zoomToFit(state.size))
 			case "0": setScale(1.0)
 			case "-": setScale(state.magnification / 2.0)
 			case "=": setScale(state.magnification * 2.0)
 
-			case "x" where modifiers == .command: dispatch { cut() }
-			case "c" where modifiers == .command: dispatch { copy() }
-			case "v" where modifiers == .command: dispatch { paste() }
-
-			case "x": state.swapColors()
-			case "w" where modifiers == .control: dispatch { wipeLayer() }
-			case "r" where modifiers == .control: sizeDialogPresented = true
+			case "x" where modifiers == .command: dispatch { focusedState.cut() }
+			case "c" where modifiers == .command: dispatch { focusedState.copy() }
+			case "v" where modifiers == .command: dispatch { focusedState.paste() }
 
 			default:
 				switch keys.key.character {
 				case "\u{9}": state.layer = (state.layer + 1) & 0b11
 				case "\u{19}": state.layer = (state.layer - 1) & 0b11
-				case KeyEquivalent.leftArrow.character: dispatch { move(dx: -1) }
-				case KeyEquivalent.downArrow.character: dispatch { move(dy: 1) }
-				case KeyEquivalent.upArrow.character: dispatch { move(dy: -1) }
-				case KeyEquivalent.rightArrow.character: dispatch { move(dx: 1) }
+				case KeyEquivalent.space.character: state.toggleLayer()
+				case KeyEquivalent.leftArrow.character: dispatch { focusedState.move(dx: -1) }
+				case KeyEquivalent.downArrow.character: dispatch { focusedState.move(dy: 1) }
+				case KeyEquivalent.upArrow.character: dispatch { focusedState.move(dy: -1) }
+				case KeyEquivalent.rightArrow.character: dispatch { focusedState.move(dx: 1) }
 				default: return .ignored
 				}
 			}

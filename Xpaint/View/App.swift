@@ -5,21 +5,22 @@ struct PaintApp: App {
 	@UserDefault(default: .warm)
 	var palette: Palette
 	@Heap
-	var rx: PxBuffer = .rx
+	var global: Film = .global
 
 	var body: some Scene {
 		documentGroup(PXD.self)
 		documentGroup(PNG.self)
+		.commands { MenuCommands() }
 	}
 
 	func documentGroup<T: TypeProvider>(_ type: T.Type) -> some Scene {
 		DocumentGroup(
 			newDocument: Document<T>(),
 			editor: { cfg in
-				EditorView(
+				EditorView<T>(
 					palette: $palette,
-					file: cfg.$document,
-					rx: $rx
+					film: cfg.$document.film,
+					global: $global
 				)
 			}
 		)

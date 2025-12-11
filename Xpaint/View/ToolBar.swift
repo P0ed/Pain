@@ -26,30 +26,11 @@ extension EditorView {
 		}
 		ToolbarItemGroup {
 			ActionButton(
-				name: "Make monochrome",
-				image: "sum",
-				shortcut: "G",
-				modifiers: .command,
-				action: makeMonochrome
-			)
-			ActionButton(
-				name: "Shift left",
-				image: "chevron.left.2",
-				shortcut: "<",
-				action: shiftLeft
-			)
-			ActionButton(
-				name: "Shift right",
-				image: "chevron.right.2",
-				shortcut: ">",
-				action: shiftRight
-			)
-			ActionButton(
 				name: "Export",
 				image: "square.and.arrow.up",
 				shortcut: "E",
 				modifiers: .command,
-				action: exportFile
+				action: { focusedState.exportFile(ContentType.self) }
 			)
 		}
 	}
@@ -72,10 +53,12 @@ struct ActionButton: View {
 	var image: String
 	var shortcut: Character
 	var modifiers: EventModifiers = []
+	var disabled: Bool = false
 	var action: () -> Void
 
 	var body: some View {
 		Button(name, systemImage: image, action: action)
+			.disabled(disabled)
 			.keyboardShortcut(KeyEquivalent(shortcut), modifiers: modifiers)
 	}
 }
