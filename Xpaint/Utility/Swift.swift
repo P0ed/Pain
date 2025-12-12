@@ -34,23 +34,6 @@ struct Err: Error {
 	}
 }
 
-extension InlineArray {
-
-	var array: [Element] { map(id) }
-
-	func map<Mapped>(_ transform: (Element) -> Mapped) -> [Mapped] {
-		indices.map { i in transform(self[i]) }
-	}
-
-	func compactMap<Mapped>(_ transform: (Element) -> Mapped?) -> [Mapped] {
-		indices.compactMap { i in transform(self[i]) }
-	}
-
-	mutating func modifyEach(_ transform: (inout Element) -> ()) {
-		for i in indices { transform(&self[i]) }
-	}
-}
-
 extension Array {
 
 	func mapInPlace(_ transform: (inout Element) -> Void) -> Self {
@@ -74,25 +57,5 @@ extension Array {
 				self[idx]
 			}
 		}
-	}
-
-	func inline<let staticCount: Int>() throws -> InlineArray<staticCount, Element> {
-		if count == staticCount {
-			.init { i in self[i] }
-		} else {
-			throw Err("Failed to load InlineArray. `count: \(count) != \(staticCount)`")
-		}
-	}
-}
-
-extension InlineArray: @retroactive Codable where Element: Codable {
-
-	public init(from decoder: any Decoder) throws {
-		self = try decoder.singleValueContainer().decode([Element].self).inline()
-	}
-
-	public func encode(to encoder: any Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(array)
 	}
 }
