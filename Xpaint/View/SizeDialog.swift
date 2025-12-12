@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SizeDialog: View {
 	var size: FilmSize
-	var onConfirm: (Int, Int) -> Void
+	var confirm: (Int, Int) -> Void
 
 	@State var width: String = ""
 	@State var height: String = ""
@@ -10,14 +10,17 @@ struct SizeDialog: View {
 	private var w: Int? { width.isEmpty ? size.width : Int(width) }
 	private var h: Int? { height.isEmpty ? size.height : Int(height) }
 
-	private var isValidSize: Bool {
+	private var isValid: Bool {
 		guard let w, let h else { return false }
 		return w > 0 && h > 0 && w * h <= FilmSize.max.count
 	}
-	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
-		VStack(spacing: 16.0) {
+		Dialog(
+			action: "Resize",
+			isValid: isValid,
+			confirm: { if let w, let h { confirm(w, h) } }
+		) {
 			HStack {
 				TextField("\(size.width)", text: $width)
 					.frame(width: 64.0)
@@ -29,21 +32,6 @@ struct SizeDialog: View {
 					.frame(width: 64.0)
 					.multilineTextAlignment(.trailing)
 			}
-			HStack {
-				Button("Cancel") {
-					dismiss()
-				}
-				.keyboardShortcut(.cancelAction)
-
-				Button("Resize") {
-					guard let w, let h else { return }
-					onConfirm(w, h)
-					dismiss()
-				}
-				.disabled(!isValidSize)
-				.keyboardShortcut(.defaultAction)
-			}
 		}
-		.padding(24.0)
 	}
 }

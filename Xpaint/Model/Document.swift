@@ -18,7 +18,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 	}
 
 	init(width: Int = 32, height: Int = 32, color: Px? = .white) {
-		film = Film(width: width, height: height, color: color)
+		film = Film(width: width, height: height, frames: Self.hasLayers ? 4 : 1, color: color)
 	}
 
 	init<T: TypeProvider>(converting file: Document<T>) where T.ExportType == ContentType {

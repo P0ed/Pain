@@ -45,20 +45,20 @@ private extension EditorView {
 
 	private func bucket(at pxl: PxL) {
 		let size = film.size
+		let xy = pxl.xy
 		let layer = pxl.z
-		let pxl = pxl.xy
 
-		guard let idx = size.index(at: pxl.xy) else { return }
+		guard let idx = size.index(at: xy) else { return }
 
 		film.withMutableLayer(layer) { pxs in
 			let c = pxs[idx]
 			let pc = state.primaryColor
 			let sc = state.dither ? state.secondaryColor : pc
-			pxs[idx] = pxl.isEven ? pc : sc
+			pxs[idx] = xy.isEven ? pc : sc
 
 			var stroke = BitSet(count: size.count)
 			stroke[idx] = true
-			var front = [pxl] as [PxL]
+			var front = [xy] as [PxL]
 			while !front.isEmpty {
 				front = front.flatMap { pxl in
 					pxl.neighbors.compactMap { pxl in

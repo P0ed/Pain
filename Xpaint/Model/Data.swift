@@ -1,3 +1,5 @@
+import CoreGraphics
+
 /// Pixel location
 struct PxL: Hashable {
     private var _x: Int16
@@ -14,7 +16,7 @@ struct PxL: Hashable {
 		_z = Int8(z & 0b11)
     }
 
-	var neighbors: [4 of PxL] {
+	var neighbors: [PxL] {
 		[
 			.init(x: x - 1, y: y, z: z),
 			.init(x: x + 1, y: y, z: z),
@@ -36,6 +38,11 @@ struct FilmSize: Hashable {
 	var width: Int
 	var height: Int
 	var frames: Int
+}
+
+extension FilmSize {
+
+	var count: Int { width * height }
 
 	static var max: FilmSize {
 		FilmSize(width: 4096, height: 4096, frames: 1)
@@ -44,14 +51,20 @@ struct FilmSize: Hashable {
 	func alloc(color: Px = .clear) -> [Px] {
 		.init(repeating: color, count: count * frames)
 	}
-}
 
-extension Film {
+	func index(at pxl: PxL) -> Int? {
+		if pxl.x >= 0 && pxl.x < width && pxl.y >= 0 && pxl.y < height {
+			.some(pxl.x + (height - 1 - pxl.y) * width + count * pxl.z)
+		} else {
+			.none
+		}
+	}
 
-	static var global: Film {
-		Film(
-			size: .init(width: 0, height: 0, frames: 1),
-			pxs: FilmSize.max.alloc()
+	func pxl(at index: Int) -> PxL {
+		PxL(
+			x: index % count % width,
+			y: height - 1 - index % count / width,
+			z: index / count
 		)
 	}
 }
@@ -77,6 +90,15 @@ extension Px {
 		green = UInt8(argb >> 8 & 0xFF)
 		blue = UInt8(argb >> 16 & 0xFF)
 		alpha = UInt8(argb >> 24 & 0xFF)
+	}
+
+	var cg: CGColor {
+		CGColor(
+			red: CGFloat(redf),
+			green: CGFloat(greenf),
+			blue: CGFloat(bluef),
+			alpha: CGFloat(alphaf)
+		)
 	}
 
 	var alphaf: Float { Float(alpha) / 255.0 }
@@ -114,36 +136,5 @@ struct Palette: Hashable, Codable {
 	subscript(_ idx: Int) -> Px {
 		get { colors[idx & 0xF] }
 		set { colors[idx & 0xF] = newValue }
-	}
-}
-
-struct BitSet {
-	private static var width: Int { 8 }
-
-	private(set) var storage: [UInt8]
-	private(set) var count: Int
-
-	var indices: Range<Int> {
-		0..<count
-	}
-
-	init(count: Int) {
-		self.count = count
-		storage = .init(repeating: 0, count: (count + Self.width - 1) / Self.width)
-	}
-
-	subscript(_ index: Int) -> Bool {
-		get {
-			index >= 0 && index < count
-			? storage[index / Self.width] & 1 << (index % Self.width) != 0
-			: false
-		}
-		set {
-			if newValue {
-				storage[index / Self.width] |= 1 << (index % Self.width)
-			} else {
-				storage[index / Self.width] &= ~(1 << (index % Self.width))
-			}
-		}
 	}
 }

@@ -2,10 +2,8 @@ import SwiftUI
 
 @main
 struct PaintApp: App {
-	@UserDefault(default: .warm)
-	var palette: Palette
-	@Binding(copy: Film.global)
-	var global: Film
+	@UserDefault(default: .warm) var palette: Palette
+	@State var global: Film = .global
 
 	var body: some Scene {
 		documentGroup(PXD.self)

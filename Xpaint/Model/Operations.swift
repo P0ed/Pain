@@ -1,6 +1,17 @@
 import SwiftUI
 
-extension FocusedState {
+struct Operations {
+	@Binding var state: EditorState
+	@Binding var palette: Palette
+	@Binding var film: Film
+	@Binding var global: Film
+}
+
+extension Operations {
+
+	func scaleToFit() {
+		state.setScale(film.size.zoomToFit(state.size))
+	}
 
 	func shiftLeft() {
 		film.withMutablePixel(state.layer) { px in

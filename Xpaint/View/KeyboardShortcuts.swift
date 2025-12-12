@@ -32,19 +32,14 @@ extension EditorView {
 			case "7", "&": numAction(6)
 			case "8", "*": numAction(7)
 
-			case "x" where modifiers == .command: dispatch { focusedState.cut() }
-			case "c" where modifiers == .command: dispatch { focusedState.copy() }
-			case "v" where modifiers == .command: dispatch { focusedState.paste() }
-
 			default:
 				switch keys.key.character {
-				case "\u{9}": state.layer = (state.layer + 1) & 0b11
-				case "\u{19}": state.layer = (state.layer - 1) & 0b11
-				case KeyEquivalent.space.character: state.toggleLayer()
-				case KeyEquivalent.leftArrow.character: dispatch { focusedState.move(dx: -1) }
-				case KeyEquivalent.downArrow.character: dispatch { focusedState.move(dy: 1) }
-				case KeyEquivalent.upArrow.character: dispatch { focusedState.move(dy: -1) }
-				case KeyEquivalent.rightArrow.character: dispatch { focusedState.move(dx: 1) }
+				case "\u{9}": state.nextLayer()
+				case "\u{19}": state.prevLayer()
+				case KeyEquivalent.leftArrow.character: dispatch { operations.move(dx: -1) }
+				case KeyEquivalent.downArrow.character: dispatch { operations.move(dy: 1) }
+				case KeyEquivalent.upArrow.character: dispatch { operations.move(dy: -1) }
+				case KeyEquivalent.rightArrow.character: dispatch { operations.move(dx: 1) }
 				default: return .ignored
 				}
 			}

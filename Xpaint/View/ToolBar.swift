@@ -10,9 +10,7 @@ extension EditorView {
 					LayerButton(index: idx, state: $state)
 				}
 			}
-			ToolbarItemGroup {
-				Spacer()
-			}
+			ToolbarItemGroup { Spacer() }
 		}
 		ToolbarItemGroup {
 			ToolButton(tool: .pencil, state: $state.tool)
@@ -21,16 +19,14 @@ extension EditorView {
 			ToolButton(tool: .bucket, state: $state.tool)
 			ToolButton(tool: .replace, state: $state.tool)
 		}
-		ToolbarItemGroup {
-			Spacer()
-		}
+		ToolbarItemGroup { Spacer() }
 		ToolbarItemGroup {
 			ActionButton(
 				name: "Export",
 				image: "square.and.arrow.up",
 				shortcut: "E",
 				modifiers: .command,
-				action: { focusedState.exportFile(ContentType.self) }
+				action: { operations.exportFile(ContentType.self) }
 			)
 		}
 	}

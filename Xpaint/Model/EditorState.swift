@@ -12,6 +12,7 @@ struct EditorState: Equatable {
 	var scrollPosition: ScrollPosition = .init(point: .zero)
 	var magnification: CGFloat = 1.0
 	var sizeDialogPresented: Bool = false
+	var colorDialogPresented: Bool = false
 	var exporting: Bool = false
 	var exportedFilm: Film?
 }
@@ -52,6 +53,14 @@ extension EditorState {
 		? visibleLayers & ~(1 << layer)
 		: visibleLayers | (1 << layer)
 	}
+
+	mutating func prevLayer() {
+		layer = (layer - 1) & 0b11
+	}
+
+	mutating func nextLayer() {
+		layer = (layer + 1) & 0b11
+	}
 }
 
 enum Tool {
@@ -88,18 +97,5 @@ extension Tool {
 		case .replace: "R"
 		case .eyedropper: "I"
 		}
-	}
-}
-
-struct FocusedState {
-	@Binding var film: Film
-	@Binding var state: EditorState
-	@Binding var global: Film
-}
-
-extension FocusedState {
-
-	func scaleToFit() {
-		state.setScale(film.size.zoomToFit(state.size))
 	}
 }

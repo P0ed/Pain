@@ -20,7 +20,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 		.focusable()
 		.focused($focused)
 		.focusEffectDisabled()
-		.focusedSceneValue(\.state, focusedState)
+		.focusedSceneValue(\.operations, operations)
 		.onAppear { focused = true }
 		.onKeyPress(action: keyboardController)
 		.fileExporter(
@@ -31,6 +31,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 			state.exportedFilm = nil
 		}
 		.sheet(isPresented: $state.sizeDialogPresented) { sizeDialog }
+		.sheet(isPresented: $state.colorDialogPresented) { colorDialog }
 	}
 
 	var sizeDialog: some View {
@@ -39,11 +40,16 @@ struct EditorView<ContentType: TypeProvider>: View {
 		}
 	}
 
-	var focusedState: FocusedState {
-		FocusedState(
-			film: $film,
+	var colorDialog: some View {
+		ColorDialog(color: $state.primaryColor)
+	}
+
+	var operations: Operations {
+		Operations(
 			state: $state,
-			global: $global
+			palette: $palette,
+			film: _film,
+			global: _global
 		)
 	}
 

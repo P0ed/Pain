@@ -16,7 +16,7 @@ extension Film {
 		}
 	}
 
-	init(width: Int = 32, height: Int = 32, frames: Int = 1, color: Px? = .white) {
+	init(width: Int = 32, height: Int = 32, frames: Int, color: Px? = .white) {
 		self = .init(
 			size: FilmSize(width: width, height: height, frames: frames),
 			color: color
@@ -59,7 +59,7 @@ extension Film {
 	mutating func resize(width: Int, height: Int) {
 		guard let film = image() else { return }
 
-		var new = Film(width: width, height: height, color: .none)
+		var new = Film(width: width, height: height, frames: size.frames, color: .none)
 		new.drawFilm(film)
 
 		self = new
@@ -178,5 +178,15 @@ extension Film {
 				context.draw(image.ui, in: CGRect(origin: .zero, size: size))
 			}
 		}
+	}
+}
+
+extension Film {
+
+	static var global: Film {
+		Film(
+			size: .init(width: 0, height: 0, frames: 1),
+			pxs: FilmSize.max.alloc()
+		)
 	}
 }
