@@ -13,6 +13,7 @@ struct EditorState: Equatable {
 	var magnification: CGFloat = 1.0
 	var sizeDialogPresented: Bool = false
 	var colorDialogPresented: Bool = false
+	var shaderDialogPresented: Bool = false
 	var exporting: Bool = false
 	var exportedFilm: Film?
 }

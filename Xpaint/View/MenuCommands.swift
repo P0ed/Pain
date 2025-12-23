@@ -147,5 +147,21 @@ struct MenuCommands: Commands {
 				action: { operations?.state.colorDialogPresented = true }
 			)
 		}
+		CommandMenu("Shader") {
+			ActionButton(
+				name: "Edit",
+				image: "record.circle.fill",
+				shortcut: "E",
+				modifiers: .control,
+				action: { operations?.state.shaderDialogPresented = true }
+			)
+			ActionButton(
+				name: "Apply",
+				image: "play.fill",
+				shortcut: "A",
+				modifiers: .control,
+				action: { operations?.applyShader() }
+			)
+		}
 	}
 }

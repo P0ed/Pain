@@ -23,6 +23,8 @@
 		5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */; };
 		5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */; };
 		5F3FA6C12ED505D100C15785 /* SideBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3FA6C02ED505C800C15785 /* SideBar.swift */; };
+		5F5763C92EFACFF7001AB4B3 /* ShaderDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5763C82EFACFF4001AB4B3 /* ShaderDialog.swift */; };
+		5F5763CB2EFAD78C001AB4B3 /* Shader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5763CA2EFAD78C001AB4B3 /* Shader.swift */; };
 		5F5FDB082EC63A73003B29BD /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5FDB072EC63A6D003B29BD /* Operations.swift */; };
 		5F923FF42EEC5F5900C53693 /* BitSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F923FF32EEC5F5900C53693 /* BitSet.swift */; };
 		5F923FF62EEC716800C53693 /* ColorDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F923FF52EEC716400C53693 /* ColorDialog.swift */; };
@@ -50,6 +52,8 @@
 		5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		5F28FCAC2EABDC8100C0A181 /* ToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBar.swift; sourceTree = "<group>"; };
 		5F3FA6C02ED505C800C15785 /* SideBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBar.swift; sourceTree = "<group>"; };
+		5F5763C82EFACFF4001AB4B3 /* ShaderDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShaderDialog.swift; sourceTree = "<group>"; };
+		5F5763CA2EFAD78C001AB4B3 /* Shader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shader.swift; sourceTree = "<group>"; };
 		5F5FDB072EC63A6D003B29BD /* Operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operations.swift; sourceTree = "<group>"; };
 		5F923FF32EEC5F5900C53693 /* BitSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitSet.swift; sourceTree = "<group>"; };
 		5F923FF52EEC716400C53693 /* ColorDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorDialog.swift; sourceTree = "<group>"; };
@@ -105,6 +109,7 @@
 				5F923FF72EEC832300C53693 /* Dialog.swift */,
 				5FCF466A2ED8853700FE5C73 /* SizeDialog.swift */,
 				5F923FF52EEC716400C53693 /* ColorDialog.swift */,
+				5F5763C82EFACFF4001AB4B3 /* ShaderDialog.swift */,
 				5F28FCAB2EABDC8100C0A181 /* KeyboardShortcuts.swift */,
 			);
 			path = View;
@@ -121,6 +126,7 @@
 				5F923FF32EEC5F5900C53693 /* BitSet.swift */,
 				5F28FCA52EABDC8100C0A181 /* Colors.swift */,
 				5F28FCA82EABDC8100C0A181 /* Drawing.swift */,
+				5F5763CA2EFAD78C001AB4B3 /* Shader.swift */,
 				5F5FDB072EC63A6D003B29BD /* Operations.swift */,
 			);
 			path = Model;
@@ -172,7 +178,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					5FF2A3AF2E8F136C00EA7883 = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -228,12 +234,14 @@
 				5F923FF82EEC832300C53693 /* Dialog.swift in Sources */,
 				5F28FCB52EABDC8100C0A181 /* App.swift in Sources */,
 				5F28FCB62EABDC8100C0A181 /* Colors.swift in Sources */,
+				5F5763CB2EFAD78C001AB4B3 /* Shader.swift in Sources */,
 				5F28FCB72EABDC8100C0A181 /* Data.swift in Sources */,
 				5F28FCB82EABDC8100C0A181 /* Document.swift in Sources */,
 				5F5FDB082EC63A73003B29BD /* Operations.swift in Sources */,
 				5F28FCB92EABDC8100C0A181 /* Drawing.swift in Sources */,
 				5F28FCBA2EABDC8100C0A181 /* EditorView.swift in Sources */,
 				5F28FCBB2EABDC8100C0A181 /* KeyboardShortcuts.swift in Sources */,
+				5F5763C92EFACFF7001AB4B3 /* ShaderDialog.swift in Sources */,
 				5F923FF62EEC716800C53693 /* ColorDialog.swift in Sources */,
 				5F28FCBC2EABDC8100C0A181 /* ToolBar.swift in Sources */,
 			);
@@ -276,6 +284,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -300,6 +309,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -339,6 +349,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -356,6 +367,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -368,6 +380,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
@@ -411,6 +424,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;

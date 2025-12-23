@@ -2,6 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct EditorView<ContentType: TypeProvider>: View {
+	@UserDefault(default: .default) var shader: Shader
 	@State var state: EditorState = .init()
 	@Binding var palette: Palette
 	@Binding var film: Film
@@ -32,6 +33,7 @@ struct EditorView<ContentType: TypeProvider>: View {
 		}
 		.sheet(isPresented: $state.sizeDialogPresented) { sizeDialog }
 		.sheet(isPresented: $state.colorDialogPresented) { colorDialog }
+		.sheet(isPresented: $state.shaderDialogPresented) { shaderDialog }
 	}
 
 	var sizeDialog: some View {
@@ -44,10 +46,15 @@ struct EditorView<ContentType: TypeProvider>: View {
 		ColorDialog(color: $state.primaryColor)
 	}
 
+	var shaderDialog: some View {
+		ShaderDialog(shader: $shader)
+	}
+
 	var operations: Operations {
 		Operations(
 			state: $state,
 			palette: $palette,
+			shader: $shader,
 			film: _film,
 			global: _global
 		)

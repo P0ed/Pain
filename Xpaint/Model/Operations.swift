@@ -3,6 +3,7 @@ import SwiftUI
 struct Operations {
 	@Binding var state: EditorState
 	@Binding var palette: Palette
+	@Binding var shader: Shader
 	@Binding var film: Film
 	@Binding var global: Film
 }
@@ -77,5 +78,9 @@ extension Operations {
 				}
 			}
 		}
+	}
+
+	func applyShader() {
+		shader(state.layer, &film)
 	}
 }
