@@ -5,7 +5,7 @@ extension FocusedValues {
 }
 
 struct MenuCommands: Commands {
-	@FocusedValue(\.operations) var operations
+	@FocusedValue(\.operations) var op
 
 	var body: some Commands {
 		CommandGroup(replacing: .pasteboard) {
@@ -14,24 +14,24 @@ struct MenuCommands: Commands {
 				image: "scissors",
 				shortcut: "X",
 				modifiers: .command,
-				disabled: operations == nil,
-				action: { operations?.cut() }
+				disabled: op == nil,
+				action: { op?.cut() }
 			)
 			ActionButton(
 				name: "Copy",
 				image: "document.on.document",
 				shortcut: "C",
 				modifiers: .command,
-				disabled: operations == nil,
-				action: { operations?.copy() }
+				disabled: op == nil,
+				action: { op?.copy() }
 			)
 			ActionButton(
 				name: "Paste",
 				image: "document.on.clipboard",
 				shortcut: "V",
 				modifiers: .command,
-				disabled: operations == nil,
-				action: { operations?.paste() }
+				disabled: op == nil,
+				action: { op?.paste() }
 			)
 		}
 		CommandGroup(before: .windowSize) {
@@ -39,29 +39,29 @@ struct MenuCommands: Commands {
 				name: "Size to fit",
 				image: "arrow.up.left.and.down.right.magnifyingglass",
 				shortcut: "9",
-				disabled: operations == nil,
-				action: { operations?.scaleToFit() }
+				disabled: op == nil,
+				action: { op?.scaleToFit() }
 			)
 			ActionButton(
 				name: "Actual size",
 				image: "1.magnifyingglass",
 				shortcut: "0",
-				disabled: operations == nil,
-				action: { operations?.state.setScale(1.0) }
+				disabled: op == nil,
+				action: { op?.state.setScale(1.0) }
 			)
 			ActionButton(
 				name: "Zoom out",
 				image: "minus.magnifyingglass",
 				shortcut: "-",
-				disabled: operations == nil,
-				action: { operations?.state.setScale((operations?.state.magnification ?? 1.0) / 2.0) }
+				disabled: op == nil,
+				action: { op?.state.setScale((op?.state.magnification ?? 1.0) / 2.0) }
 			)
 			ActionButton(
 				name: "Zoom in",
 				image: "plus.magnifyingglass",
 				shortcut: "=",
-				disabled: operations == nil,
-				action: { operations?.state.setScale((operations?.state.magnification ?? 1.0) * 2.0) }
+				disabled: op == nil,
+				action: { op?.state.setScale((op?.state.magnification ?? 1.0) * 2.0) }
 			)
 			Divider()
 		}
@@ -71,16 +71,16 @@ struct MenuCommands: Commands {
 				image: "square.resize",
 				shortcut: "R",
 				modifiers: .command,
-				disabled: operations == nil,
-				action: { operations?.state.sizeDialogPresented = true }
+				disabled: op == nil,
+				action: { op?.state.sizeDialogPresented = true }
 			)
 			ActionButton(
-				name: "Wipe layer",
+				name: "Wipe",
 				image: "windshield.rear.and.wiper",
 				shortcut: "W",
 				modifiers: .control,
-				disabled: operations == nil,
-				action: { operations?.wipeLayer() }
+				disabled: op == nil,
+				action: { op?.wipeLayer() }
 			)
 			Divider()
 			ActionButton(
@@ -88,46 +88,65 @@ struct MenuCommands: Commands {
 				image: "sum",
 				shortcut: "G",
 				modifiers: .command,
-				disabled: operations == nil,
-				action: { operations?.makeMonochrome() }
+				disabled: op == nil,
+				action: { op?.makeMonochrome() }
 			)
 			ActionButton(
 				name: "Shift left",
 				image: "chevron.left.2",
 				shortcut: "<",
-				disabled: operations == nil,
-				action: { operations?.shiftLeft() }
+				disabled: op == nil,
+				action: { op?.shiftLeft() }
 			)
 			ActionButton(
 				name: "Shift right",
 				image: "chevron.right.2",
 				shortcut: ">",
-				disabled: operations == nil,
-				action: { operations?.shiftRight() }
+				disabled: op == nil,
+				action: { op?.shiftRight() }
 			)
+			Divider()
+			Menu("Shader") {
+				ActionButton(
+					name: "Edit",
+					image: "record.circle.fill",
+					shortcut: "E",
+					modifiers: .control,
+					disabled: op == nil,
+					action: { op?.state.shaderDialogPresented = true }
+				)
+				ActionButton(
+					name: "Apply",
+					image: "play.fill",
+					shortcut: "A",
+					modifiers: .control,
+					disabled: op == nil,
+					action: { op?.applyShader() }
+				)
+			}
 		}
-		if operations?.film.size.frames ?? 0 > 1 {
+		if op?.film.size.frames ?? 0 > 1 {
 			CommandMenu("Layers") {
 				ActionButton(
 					name: "Previous layer",
 					image: "square.3.layers.3d.bottom.filled",
 					shortcut: "\u{19}",
-					disabled: operations == nil,
-					action: { operations?.state.prevLayer() }
+					disabled: op == nil,
+					action: { op?.state.prevLayer() }
 				)
 				ActionButton(
 					name: "Next layer",
 					image: "square.3.layers.3d.top.filled",
 					shortcut: "\u{9}",
-					disabled: operations == nil,
-					action: { operations?.state.nextLayer() }
+					disabled: op == nil,
+					action: { op?.state.nextLayer() }
 				)
 				ActionButton(
 					name: "Toggle layer",
 					image: "square.3.layers.3d",
 					shortcut: " ",
-					disabled: operations == nil,
-					action: { operations?.state.toggleLayer() }
+					disabled: op == nil,
+					action: { op?.state.toggleLayer() }
 				)
 			}
 		}
@@ -136,31 +155,15 @@ struct MenuCommands: Commands {
 				name: "Swap colors",
 				image: "rectangle.2.swap",
 				shortcut: "x",
-				disabled: operations == nil,
-				action: { operations?.state.swapColors() }
+				disabled: op == nil,
+				action: { op?.state.swapColors() }
 			)
 			ActionButton(
 				name: "Pick color",
 				image: "paintpalette",
 				shortcut: "§",
-				disabled: operations == nil,
-				action: { operations?.state.colorDialogPresented = true }
-			)
-		}
-		CommandMenu("Shader") {
-			ActionButton(
-				name: "Edit",
-				image: "record.circle.fill",
-				shortcut: "E",
-				modifiers: .control,
-				action: { operations?.state.shaderDialogPresented = true }
-			)
-			ActionButton(
-				name: "Apply",
-				image: "play.fill",
-				shortcut: "A",
-				modifiers: .control,
-				action: { operations?.applyShader() }
+				disabled: op == nil,
+				action: { op?.state.colorDialogPresented = true }
 			)
 		}
 	}

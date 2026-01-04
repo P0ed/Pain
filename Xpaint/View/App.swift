@@ -12,8 +12,13 @@ struct PaintApp: App {
 	}
 
 	func documentGroup<T: TypeProvider>(_ type: T.Type) -> some Scene {
-		DocumentGroup(
-			newDocument: Document<T>(),
+		let size = global.size
+		let isEmpty = size.count == 0
+		return DocumentGroup(
+			newDocument: Document<T>(
+				width: isEmpty ? 32 : size.width,
+				height: isEmpty ? 32 : size.height,
+			),
 			editor: { cfg in
 				EditorView<T>(
 					palette: $palette,

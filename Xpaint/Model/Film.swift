@@ -1,7 +1,7 @@
 import CoreGraphics
 import SwiftUI
 
-struct Film: Equatable {
+struct Film: Equatable, Sendable {
 	var size: FilmSize
 	var pxs: [Px]
 }

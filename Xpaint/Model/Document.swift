@@ -11,14 +11,14 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 	}
 
 	static var readableContentTypes: [UTType] { [ContentType.type] }
-	static var hasLayers: Bool { ContentType.type == .pxd }
+	static var frames: Int { ContentType.type == .pxd ? 4 : 1 }
 
 	init(film: Film) {
 		self.film = film
 	}
 
 	init(width: Int = 32, height: Int = 32, color: Px? = .white) {
-		film = Film(width: width, height: height, frames: Self.hasLayers ? 4 : 1, color: color)
+		film = Film(width: width, height: height, frames: Self.frames, color: color)
 	}
 
 	init<T: TypeProvider>(converting file: Document<T>) where T.ExportType == ContentType {
@@ -26,7 +26,7 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 			size: FilmSize(
 				width: file.size.width,
 				height: file.size.height,
-				frames: Self.hasLayers ? 4 : 1
+				frames: Self.frames
 			)
 		)
 		film.merge(file.film)
@@ -39,13 +39,13 @@ struct Document<ContentType: TypeProvider>: FileDocument {
 		let image = try (NSBitmapImageRep(data: data)?.cgImage)
 			.throwing("Failed to open image")
 
-		if Self.hasLayers, image.height & 0b11 != 0 {
+		if Self.frames == 4, image.height & 0b11 != 0 {
 			throw Err("Corrupted file")
 		}
 		let size = FilmSize(
 			width: image.width,
-			height: image.height / (Self.hasLayers ? 4 : 1),
-			frames: Self.hasLayers ? 4 : 1
+			height: image.height / Self.frames,
+			frames: Self.frames
 		)
 		if size.count > FilmSize.max.count {
 			throw Err("File too large")
